@@ -28,8 +28,61 @@ export const DASHBOARD_STATS = [
 ];
 
 export const RECENT_INQUIRIES = [
-  { id: "JD", name: "James Dawson", subject: "Everest Base Camp Luxury Tour", status: "PENDING", date: "Oct 12, 2023", initials: "JD"},
-  { id: "ML", name: "Maya Lin", subject: "Annapurna Circuit Inquiry", status: "REPLIED", date: "Oct 11, 2023", initials: "ML" },
-  { id: "RK", name: "Robert King", subject: "Booking for K2 Base Camp", status: "PENDING", date: "Oct 10, 2023", initials: "RK" },
-  { id: "SP", name: "Sarah Park", subject: "Manaslu Circuit Gear List", status: "REPLIED", date: "Oct 10, 2023", initials: "SP" },
+  { 
+    id: "JD", 
+    name: "James Dawson", 
+    email: "james.dawson@example.com",
+    subject: "Everest Base Camp Luxury Tour", 
+    status: "PENDING", 
+    date: "Oct 12, 2023", 
+    initials: "JD"
+  },
+  { 
+    id: "ML", 
+    name: "Maya Lin", 
+    email: "maya.lin@example.com",
+    subject: "Annapurna Circuit Inquiry", 
+    status: "REPLIED", 
+    date: "Oct 11, 2023", 
+    initials: "ML" 
+  },
+  { 
+    id: "RK", 
+    name: "Robert King", 
+    email: "robert.king@example.com",
+    subject: "Booking for K2 Base Camp", 
+    status: "PENDING", 
+    date: "Oct 10, 2023", 
+    initials: "RK" 
+  },
+  { 
+    id: "SP", 
+    name: "Sarah Park", 
+    email: "sarah.park@example.com",
+    subject: "Manaslu Circuit Gear List", 
+    status: "REPLIED", 
+    date: "Oct 10, 2023", 
+    initials: "SP" 
+  },
 ];
+
+export const INQUIRY_FILTER_TABS=[
+    {
+        id:"all",
+        label:"All Inquiries",
+        count:248,
+        value:"All",
+    },
+    {
+        id:"pending",
+        label:"Pending",
+        count:12,
+        value:"Pending"
+    },
+    {
+        id:"replied",
+        label:"Replied",
+        count:236,
+        value:"Replied"
+    }
+]
