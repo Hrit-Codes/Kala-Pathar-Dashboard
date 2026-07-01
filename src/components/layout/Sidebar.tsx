@@ -18,6 +18,7 @@ const menuItems = [
   { name: 'Inquiries', href: '/dashboard/inquiries', icon: MessageSquare },
   { name: 'Gallery', href: '/dashboard/gallery', icon: ImageIcon },
   { name: 'About Us', href: '/dashboard/about', icon: Info },
+  { name: 'Company Info', href: '/dashboard/companyinfo', icon: Info },
 ];
 
 export default function Sidebar() {
