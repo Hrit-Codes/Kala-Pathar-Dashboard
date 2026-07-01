@@ -1,3 +1,4 @@
+import Sidebar from "@/src/components/layout/Sidebar";
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation";
 
@@ -14,8 +15,15 @@ export default async function DashboardLayout({
     }
 
     return(
-        <div>
-            {children}
+        <div className="min-h-screen bg-section">
+            <Sidebar/>
+
+            <div className="pl-[280px] min-h-screen flex flex-col">
+                <main className="flex-1 p-8 ">
+                    {children}
+                </main>
+
+            </div>
         </div>
     )
 }
