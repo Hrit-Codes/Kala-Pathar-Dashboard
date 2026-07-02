@@ -7,7 +7,7 @@
   --color-section: #ffffff;
   --color-section-alternative: #f3f4f6;
 
-  /* Primary: Vibrant Tech Orange (Matches buttons & logo accent exactly) */
+  /* Primary */
   --color-primary-50: #ecfdf5;
   --color-primary-100: #d1fae5;
   --color-primary-200: #a7f3d0;
@@ -20,20 +20,39 @@
   --color-primary-900: #064e3b;
   --color-primary-950: #022c22;
 
-  /* Secondary: Ice Blue / Cyber Sky Accent (Matches UI line paths & dots) */
---color-secondary-50: #e8ecf5;
---color-secondary-100: #c8d0e6;
---color-secondary-200: #9caacd;
---color-secondary-300: #6a7fb0;
---color-secondary-400: #425a94; /* Perfect for borders and grid graphics */
---color-secondary-500: #2a4070; /* Active states & subtle text links */
---color-secondary-600: #1a2f55;
---color-secondary-700: #0f2040;
---color-secondary-800: #0a1835;
---color-secondary-900: #060f25;
---color-secondary-950: #030814;
+  /* Secondary */
+  --color-secondary-50: #e8ecf5;
+  --color-secondary-100: #c8d0e6;
+  --color-secondary-200: #9caacd;
+  --color-secondary-300: #6a7fb0;
+  --color-secondary-400: #425a94;
+  --color-secondary-500: #2a4070;
+  --color-secondary-600: #1a2f55;
+  --color-secondary-700: #0f2040;
+  --color-secondary-800: #0a1835;
+  --color-secondary-900: #060f25;
+  --color-secondary-950: #030814;
 
-  /* Description text color mapped to standard Tailwind gray-700 HEX */
+  /* Neutral — was missing, so pages were silently falling back to Tailwind's
+     default gray scale instead of a scale tied to your theme */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+
+  /* Semantic status colors — replaces raw indigo/emerald so badges,
+     alerts, and chips stay consistent across every page */
+  --color-status-pending-bg: #eef2ff;
+  --color-status-pending-text: #4f46e5;
+  --color-status-success-bg: #ecfdf5;
+  --color-status-success-text: #059669;
+
   --color-description: #374151;
 }
 
@@ -41,46 +60,66 @@ body {
   margin: 0;
 }
 
-@layer base{
-  body{
-    font-family:"Inter",sans-serif;
+@layer base {
+  body {
+    font-family: "Inter", sans-serif;
+    @apply bg-section-alternative;
   }
-  h1{
-    @apply text-2xl md:text-3xl font-semibold text-black
+  h1 { @apply text-2xl md:text-3xl font-semibold text-neutral-900; }
+  h2 { @apply text-xl md:text-2xl lg:text-3xl font-semibold text-neutral-900; }
+  h3 { @apply text-lg font-medium text-neutral-900; }
+  h4 { @apply text-lg lg:text-xl font-semibold text-neutral-900; }
+  p  { @apply text-description font-medium text-sm; }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-neutral-200/60 bg-white shadow-sm transition-colors;
   }
 
-  h2{
-    @apply text-xl md:text-2xl lg:text-3xl font-semibold text-black 
-  }
-  h3{
-    @apply font-medium
+  .card-title {
+    @apply text-base font-bold text-neutral-900 tracking-tight;
   }
 
-
-  h4{
-    @apply text-lg lg:text-xl text-black font-semibold
+  .stat-label {
+    @apply text-xs font-bold text-neutral-400 uppercase tracking-wider;
   }
 
-  p{
-    @apply text-black font-medium text-sm
+  .input {
+    @apply w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm
+           font-medium text-neutral-800 focus:outline-none
+           focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/20
+           transition-all;
   }
 
+  .badge {
+    @apply inline-block text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-md;
+  }
+  .badge-pending {
+    @apply inline-block text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-600;
+  }
+  .badge-success {
+    @apply inline-block text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-600;
+  }
+
+  .btn-quick-action {
+    @apply px-2 py-4 flex gap-2 items-center border border-neutral-200
+           hover:border-neutral-300 rounded-xl cursor-pointer transition-colors;
+  }
+
+  .btn-primary {
+    @apply px-5 py-2.5 text-xs font-bold text-white bg-primary-700
+           hover:bg-primary-800 rounded-xl transition-all shadow-sm cursor-pointer;
+  }
+  .btn-secondary {
+    @apply px-4 py-2.5 text-xs font-bold text-neutral-700 bg-white
+           border border-neutral-200 hover:border-neutral-300 rounded-xl
+           transition-all shadow-sm cursor-pointer;
+  }
 }
 
 /* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-section);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-primary-400);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-500);
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--color-section); }
+::-webkit-scrollbar-thumb { background: var(--color-primary-400); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary-500); }
