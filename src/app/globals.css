@@ -86,10 +86,10 @@ body {
   }
 
   .input {
-    @apply w-full px-4 py-2.5 border border-neutral-200 rounded-xl text-sm
+    @apply w-full px-1 py-2.5 border border-neutral-200 rounded-xl text-sm
            font-medium text-neutral-800 focus:outline-none
            focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/20
-           transition-all;
+           transition-all disabled:opacity-80 disabled:cursor-not-allowed;
   }
 
   .badge {
