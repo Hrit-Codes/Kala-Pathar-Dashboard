@@ -20,14 +20,28 @@ export interface IGalleryResponse {
     isFull: boolean;
 }
 
+export interface IGalleryCreateResponse {
+    success: boolean;
+    message: string;
+    data: IGallery;
+    slotsRemaining:number;
+}
+
 export const getGallery = async (): Promise<IGalleryResponse> => {
     const { data } = await api.get("/gallery/getAll");
     return data;
 };
 
-export const updateCompanyInfo = async (formData: FormData): Promise<IGalleryResponse> => {
-    const { data } = await api.patch("/companyinfo/update", formData, {
+export const updateGalleryItem = async (id:string,formData: FormData): Promise<IGalleryResponse> => {
+    const { data } = await api.put(`/gallery/update/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
     });
     return data.data;
 };
+
+export const createGalleryItem=async(formData:FormData):Promise<IGalleryCreateResponse>=>{
+    const {data}= await api.post("/gallery/create",formData,{
+        headers:{"Content-Type":"multipart/form-data"}
+    });
+    return data;
+}
