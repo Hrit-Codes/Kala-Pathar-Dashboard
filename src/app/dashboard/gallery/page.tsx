@@ -1,7 +1,10 @@
 import PageHeader from "@/src/components/layout/PageHeader";
 import NewGalleryButton from "@/src/components/ServerComponent/NewGalleryButton";
+import UpdateGalleryItemButton from "@/src/components/ServerComponent/UpdateGalleryItemButton";
 import { getGallery } from "@/src/lib/gallery";
+import type { GalleryItem } from "@/src/types/gallery";
 import { ImageIcon, CalendarDays, ArrowUpDown } from "lucide-react";
+
 
 export default async function GalleryPage() {
     const response = await getGallery();
@@ -82,6 +85,7 @@ export default async function GalleryPage() {
                                     <ArrowUpDown size={12} />
                                     <span>Updated {new Date(item.updatedAt).toLocaleDateString()}</span>
                                 </div>
+                                <UpdateGalleryItemButton item={item as GalleryItem}/>
                             </div>
 
                         </div>

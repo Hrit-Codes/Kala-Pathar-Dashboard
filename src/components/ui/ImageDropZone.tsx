@@ -109,7 +109,7 @@ export default function ImageDropzone({
                             <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-bold text-neutral-800 shadow-md"
+                                className="opacity-0 group-hover:opacity-100 hover:cursor-pointer transition-opacity flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-bold text-neutral-800 shadow-md"
                             >
                                 <Upload size={13} />
                                 Replace
@@ -117,7 +117,7 @@ export default function ImageDropzone({
                             <button
                                 type="button"
                                 onClick={handleClear}
-                                className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-bold text-red-500 shadow-md"
+                                className="opacity-0 group-hover:opacity-100 hover:cursor-pointer transition-opacity flex items-center gap-1.5 px-3 py-1.5 bg-white rounded-lg text-xs font-bold text-red-500 shadow-md"
                             >
                                 <X size={13} />
                                 Remove
