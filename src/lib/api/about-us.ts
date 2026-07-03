@@ -31,9 +31,16 @@ export const getAboutUs= async (): Promise<IAboutUsResponse> => {
     });
 };
 
-// export const updateWhyChooseUs = async (id: string, formData: FormData): Promise<IWhyChooseUsResponse> => {
-//     const { data } = await api.put(`/whyChooseUs/update/${id}`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//     });
-//     return data; // Return the full response, not just data.data
-// };
+export const updateAboutUs = async ( formData: FormData): Promise<IAboutUsResponse> => {
+    const { data } = await api.put(`/aboutus/update/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data; 
+};
+
+export const createAboutUs = async (formData: FormData): Promise<IAboutUsResponse> => {
+    const { data } = await api.post(`/aboutus/create`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data; 
+};

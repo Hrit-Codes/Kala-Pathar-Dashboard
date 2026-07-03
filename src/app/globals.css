@@ -101,7 +101,9 @@ body {
   .badge-success {
     @apply inline-block text-xs font-black tracking-wider uppercase px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-600;
   }
-
+  button{
+    @apply disabled:opacity-80 disabled:cursor-not-allowed
+  }
   .btn-quick-action {
     @apply px-2 py-4 flex gap-2 items-center border border-neutral-200
            hover:border-neutral-300 rounded-xl cursor-pointer transition-colors;

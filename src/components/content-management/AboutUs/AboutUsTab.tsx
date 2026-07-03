@@ -1,10 +1,31 @@
 "use client"
 
+import { createAboutUs, updateAboutUs } from "@/src/lib/api/about-us";
 import type { IAboutUs } from "@/src/types/about-us";
+import { useMutation } from "@tanstack/react-query";
 import { Building2, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+
+interface CompanyInfoFormValues {
+    heading: string;
+    tagline: string;
+    description: string;
+    ceoQuote: {
+        quoteText: string;
+        ceoName: string;
+        ceoTitle: string;
+    };
+    stats: {
+        label: string;
+        value: string;
+    }[];
+}
 
 export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
+    const router=useRouter();
     const [heroPreview, setHeroPreview] = useState<string>(initialData.heroImage || "");
     const [heroFile, setHeroFile] = useState<File | null>(null);
     const [isHeroDirty, setIsHeroDirty] = useState(false);
@@ -12,6 +33,28 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
     const [CEOPreview, setCEOPreview] = useState<string>(initialData.ceoQuote.ceoPhoto || "");
     const [CEOFile, setCEOFile] = useState<File | null>(null);
     const [isCEODirty, setIsCEODirty] = useState(false);
+
+    
+    const { register, handleSubmit, formState: { errors, isDirty } } = useForm<CompanyInfoFormValues>({
+            defaultValues: {
+                heading: initialData?.heading || "",
+                tagline: initialData?.tagline || "",
+                description: initialData?.description || "",
+                // heroImage: initialData?.heroImage || "",
+                ceoQuote:{
+                    quoteText:initialData?.ceoQuote.quoteText,
+                    ceoName:initialData?.ceoQuote.ceoName,
+                    ceoTitle:initialData?.ceoQuote.ceoTitle,
+                    // ceoPhoto:initialData?.ceoQuote.ceoPhoto
+                },
+                stats: initialData?.stats || [
+                    { label: "Happy Travellers", value: "" },
+                    { label: "Years of Experience", value: "" },
+                    { label: "Expert Local Guides", value: "" },
+                    { label: "Curated Packages", value: "" }
+                ]
+            }
+        });
 
     const handleHeroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -29,10 +72,72 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
         setIsCEODirty(true);
     };
 
+    const createMutation= useMutation({
+        mutationFn:(formData:FormData)=> createAboutUs(formData),
+        onSuccess: () => {
+            toast.success("About us added successfully");
+            setIsHeroDirty(false);
+            setIsCEODirty(false);
+            router.refresh();
+            },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || "Failed to add about us info";
+            toast.error(message);
+            }
+    });
+
+    const updateMutation= useMutation({
+        mutationFn:(formData:FormData)=> updateAboutUs(formData),
+        onSuccess: () => {
+            toast.success("About us updated successfully");
+            setIsHeroDirty(false);
+            setIsCEODirty(false);
+            router.refresh();
+            },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || "Failed to update about us info";
+            toast.error(message);
+            }
+    });
+
+    const onSubmit=(data:CompanyInfoFormValues)=>{
+        const formData= new FormData();
+
+        formData.append("heading", data.heading);
+        formData.append("tagline", data.tagline);
+        formData.append("description", data.description);
+
+        formData.append("ceoQuote[quoteText]",data.ceoQuote.quoteText);
+        formData.append("ceoQuote[ceoName]",data.ceoQuote.ceoName);
+        formData.append("ceoQuote[ceoTitle]",data.ceoQuote.ceoTitle);
+
+        data.stats.forEach((stat, idx) => {
+            formData.append(`stats[${idx}][label]`, stat.label);
+            formData.append(`stats[${idx}][value]`, stat.value);
+        });
+
+        if(heroFile){
+            formData.append("heroImage",heroFile)
+        }
+        if(CEOFile){
+            formData.append("ceoPhoto",CEOFile);
+        }
+
+        if(initialData){
+            updateAboutUs(formData);
+        }else{
+            createAboutUs(formData);
+        }
+
+    }
+
+    const isPending= updateMutation.isPending || createMutation.isPending;
+    const hasChanges=isDirty || isCEODirty || isHeroDirty
+
     return(
         <div className="w-full min-h-screen flex flex-col gap-6">
 
-            <div className="flex flex-col gap-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
                 {/* CARD 1: Basic Details */}
                         <div className="card p-6 flex flex-col gap-5">
                             <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-4">
@@ -62,8 +167,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <input
                                             type="text"
                                             className="input"
+                                            disabled={isPending}
+                                            {...register("heading",{required:"Heading is required"})}
                                         />
-                                        {/* {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>} */}
+                                        {errors.heading && <p className="text-xs text-red-500">{errors.heading.message}</p>}
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
@@ -71,8 +178,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <input
                                             type="text"
                                             className="input"
+                                            disabled={isPending}
+                                            {...register("tagline",{required:"Tagline is required"})}
                                         />
-                                        {/* {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>} */}
+                                        {errors.tagline && <p className="text-xs text-red-500">{errors.tagline.message}</p>}
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
@@ -80,7 +189,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <textarea
                                             rows={5}
                                             className="input leading-relaxed resize-none"
+                                            disabled={isPending}
+                                            {...register("description",{required:"Description is required"})}
                                         />
+                                        {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
                                     </div>
                                 </div>
                             </div>
@@ -92,8 +204,25 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                 <h4 className="card-title font-semibold">Impact Metrics</h4>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                                <h2>Hello</h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                                {initialData.stats.map((stat,index)=>(
+                                    <div key={index} className="flex flex-col gap-2 p-4 card">
+                                        <input
+                                            type="text"
+                                            className="input bg-white font-semibold text-neutral-800"
+                                            placeholder="e.g. Happy Travelers"
+                                            disabled={isPending}
+                                            {...register(`stats.${index}.label` as const, { required: "Metric Label required" })}
+                                        />
+                                        <input
+                                            type="text"
+                                            className="input bg-white font-semibold text-neutral-800"
+                                            placeholder="e.g. 2,000+"
+                                            disabled={isPending}
+                                            {...register(`stats.${index}.value` as const, { required: "Metric value required" })}
+                                        />
+                                    </div>
+                                ))}
 
                             </div>
                         </div>
@@ -126,8 +255,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <input
                                             type="text"
                                             className="input"
+                                            disabled={isPending}
+                                            {...register("ceoQuote.ceoName",{required:"Ceo name is required"})}
                                         />
-                                        {/* {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>} */}
+                                        {errors.ceoQuote?.ceoName && <p className="text-xs text-red-500">{errors.ceoQuote.ceoName.message}</p>}
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
@@ -135,8 +266,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <input
                                             type="text"
                                             className="input"
+                                            disabled={isPending}
+                                            {...register("ceoQuote.ceoTitle",{required:"Ceo title is required"})}
                                         />
-                                        {/* {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>} */}
+                                        {errors.ceoQuote?.ceoTitle && <p className="text-xs text-red-500">{errors.ceoQuote.ceoTitle.message}</p>}
                                     </div>
 
                                     <div className="flex flex-col gap-1.5">
@@ -144,12 +277,24 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                                         <textarea
                                             rows={5}
                                             className="input leading-relaxed resize-none"
+                                            disabled={isPending}
+                                            {...register("ceoQuote.quoteText",{required:"Ceo quote is required"})}
                                         />
+                                        {errors.ceoQuote?.quoteText && <p className="text-red-500 text-xs">{errors.ceoQuote.quoteText.message}</p>}
                                     </div>
                                 </div>
                             </div>
                         </div>
-            </div>
+                    <div className="flex justify-end items-center gap-3">
+                        <button
+                            type="submit"
+                            disabled={!hasChanges || isPending}
+                            className="btn-primary whitespace-nowrap"
+                        >
+                            {isPending? "Saving..." : initialData? "Update Information":"Add Information"}
+                        </button>
+                    </div>
+            </form>
 
         </div>
     )
