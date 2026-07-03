@@ -1,7 +1,7 @@
-import { getWhyChooseUs } from "@/src/lib/why-choose-us";
 import { ArrowUpDown, CalendarDays, ImageIcon } from "lucide-react";
 import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
 import UpdateWhyChooseUsItemButton from "./UpdateWhyChooseUsItemButton";
+import NewWhyChooseUsItemButton from "./NewWhyChooseUsItemButton";
 
 export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
     const isFull=items.length===3;
@@ -26,13 +26,15 @@ export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
                         className="card p-0 flex flex-col overflow-hidden"
                     >
                         {/* Content */}
-                        <div className="p-5 flex flex-col gap-2">
-                            <span className="text-[11px] font-bold tracking-wider uppercase text-primary-700">
-                                {item.title}
-                            </span>
-                            <p className="text-sm text-neutral-500 ">
-                                {item.description}
-                            </p>
+                        <div className="h-full p-5 flex flex-col justify-between gap-2">
+                            <div className="flex flex-col gap-2">
+                                <span className="text-[11px] font-bold tracking-wider uppercase text-primary-700">
+                                    {item.title}
+                                </span>
+                                <p className="text-sm text-neutral-500 ">
+                                    {item.description}
+                                </p>
+                            </div>
 
                             {/* Footer Meta */}
                             <div className="flex justify-between items-center pt-3 border-t border-neutral-100 mt-1">
@@ -52,9 +54,9 @@ export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
                 ))}
 
                 {/* Empty slot placeholder when not full */}
-                {/* {!isFull && (
-                        <NewGalleryButton />
-                )} */}
+                {!isFull && (
+                        <NewWhyChooseUsItemButton />
+                )}
             </div>
         </div>
     )

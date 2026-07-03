@@ -3,14 +3,19 @@
 import { useState, useEffect, useRef } from "react";
 import PageHeader from "@/src/components/layout/PageHeader";
 import { CONTENT_FILTER_TABS } from "@/src/lib/constants";
-import type { IWhyChooseUsResponse } from "@/src/lib/why-choose-us";
 import WhyChooseUsTab from "./WhyChooseUs/WhyChooseUsTab";
-import AboutUsTab from "./AboutUsTab";
+import AboutUsTab from "./AboutUs/AboutUsTab";
 import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
+import type { IAboutUs } from "@/src/types/about-us";
 
 type ContentTab = "About_Us" | "Why_Choose_Us";
 
-export default function ContentManagementClient({initialWhyChooseUs}:{initialWhyChooseUs:IWhyChooseUsItem[]}) {
+type ContentManagementClientProps={
+    initialWhyChooseUs:IWhyChooseUsItem[],
+    initialAboutUs:IAboutUs
+}
+
+export default function ContentManagementClient({initialWhyChooseUs, initialAboutUs}:ContentManagementClientProps) {
     const [activeTab, setActiveTab] = useState<ContentTab>("Why_Choose_Us");
     const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -67,7 +72,7 @@ export default function ContentManagementClient({initialWhyChooseUs}:{initialWhy
 
             {/* Render tabs */}
             {activeTab === "Why_Choose_Us" && <WhyChooseUsTab items={initialWhyChooseUs } />}
-            {activeTab === "About_Us" && <AboutUsTab />}
+            {activeTab === "About_Us" && <AboutUsTab initialData={initialAboutUs } />}
         </div>
     );
 }

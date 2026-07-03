@@ -1,6 +1,6 @@
 import PageHeader from "@/src/components/layout/PageHeader";
 import CompanyInfoForm from "@/src/components/company-info/CompanyInfoForm";
-import { getCompanyInfo } from "@/src/lib/company-info";
+import { getCompanyInfo } from "@/src/lib/api/company-info";
 
 export default async function CompanyInfoPage() {
   const companyInfo = await getCompanyInfo();

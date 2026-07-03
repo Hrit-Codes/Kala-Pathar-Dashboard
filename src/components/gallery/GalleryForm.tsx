@@ -8,9 +8,9 @@ import { useEffect } from "react"
 import type { GalleryFormValues, GalleryItem } from "@/src/types/gallery"
 import { gallerySchema } from "@/src/lib/vallidators/gallery.validate"
 import { useMutation } from "@tanstack/react-query"
-import { createGalleryItem, updateGalleryItem } from "@/src/lib/gallery"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
+import { createGalleryItem, updateGalleryItem } from "@/src/lib/api/gallery"
 
 interface GalleryFormProps{
     setIsFormOpen:(state:boolean)=>void

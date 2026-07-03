@@ -1,4 +1,4 @@
-import type { IWhyChooseUsItem } from "../types/why-choose-us";
+import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
 import { api } from "./api";
 
 export interface IWhyChooseUsResponse {
