@@ -7,5 +7,5 @@ export const gallerySchema = z.object({
     title: z.string().trim().min(2, "Title must be at least 2 characters"),
     subtitle: z.string().trim().min(2, "Subtitle must be at least 2 characters"),
     description: z.string().trim().min(10, "Description must be at least 10 characters"),
-    order: z.coerce.number().min(0, "Order must be 0 or greater").optional(),
+    order: z.coerce.number().min(1, "Order must be 1 or greater").optional(),
 });

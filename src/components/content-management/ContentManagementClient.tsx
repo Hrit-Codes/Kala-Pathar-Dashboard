@@ -3,20 +3,20 @@
 import { useState, useEffect, useRef } from "react";
 import PageHeader from "@/src/components/layout/PageHeader";
 import { CONTENT_FILTER_TABS } from "@/src/lib/constants";
-import WhyChooseUsTab from "./WhyChooseUs/WhyChooseUsTab";
 import AboutUsTab from "./AboutUs/AboutUsTab";
-import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
 import type { IAboutUs } from "@/src/types/about-us";
+import WhyPlanWithUsTab from "./WhyPlanWithUs/WhyPlanWithUsTab";
+import type { IWhyPlanWithUsItem } from "@/src/types/why-plan-with-us";
 
-type ContentTab = "About_Us" | "Why_Choose_Us";
+type ContentTab = "About_Us" | "Why_Plan_With_Us";
 
 type ContentManagementClientProps={
-    initialWhyChooseUs:IWhyChooseUsItem[],
+    initialWhyPlanWithUs:IWhyPlanWithUsItem[],
     initialAboutUs:IAboutUs
 }
 
-export default function ContentManagementClient({initialWhyChooseUs, initialAboutUs}:ContentManagementClientProps) {
-    const [activeTab, setActiveTab] = useState<ContentTab>("Why_Choose_Us");
+export default function ContentManagementClient({initialWhyPlanWithUs, initialAboutUs}:ContentManagementClientProps) {
+    const [activeTab, setActiveTab] = useState<ContentTab>("Why_Plan_With_Us");
     const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -71,7 +71,7 @@ export default function ContentManagementClient({initialWhyChooseUs, initialAbou
             </div>
 
             {/* Render tabs */}
-            {activeTab === "Why_Choose_Us" && <WhyChooseUsTab items={initialWhyChooseUs } />}
+            {activeTab === "Why_Plan_With_Us" && <WhyPlanWithUsTab items={initialWhyPlanWithUs } />}
             {activeTab === "About_Us" && <AboutUsTab initialData={initialAboutUs } />}
         </div>
     );

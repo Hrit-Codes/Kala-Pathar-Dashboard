@@ -1,8 +1,9 @@
 "use client"
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import WhyPlanWithUsForm from "./WhyPlanWithUsForm";
 
-export default function NewWhyChooseUsItemButton(){
+export default function NewWhyPlanWithUsItemButton(){
     const [isFormOpen,setIsFormOpen]=useState(false);
     return(
         <>
@@ -15,9 +16,9 @@ export default function NewWhyChooseUsItemButton(){
                 </button>
             </div>
 
-        {/* {isFormOpen && (
-            <GalleryForm setIsFormOpen={setIsFormOpen}/>
-        )} */}
+        {isFormOpen && (
+            <WhyPlanWithUsForm setIsFormOpen={setIsFormOpen}/>
+        )}
 
         </>
     )
