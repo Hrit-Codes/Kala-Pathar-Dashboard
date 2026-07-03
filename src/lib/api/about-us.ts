@@ -1,12 +1,5 @@
-import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
 import { api } from "./api";
 import type { IAboutUsResponse } from "@/src/types/about-us";
-
-export interface IWhyChooseUsResponse {
-    success: boolean;
-    message: string;
-    data: IWhyChooseUsItem[];
-}
 
 // Add utility for retry logic with exponential backoff
 async function fetchWithRetry<T>(

@@ -89,9 +89,9 @@ export const INQUIRY_FILTER_TABS=[
 
 export const CONTENT_FILTER_TABS=[
   {
-    id:"why_choose_us",
-    label:"Why Choose Us",
-    value:"Why_Choose_Us"
+    id:"why_plan_with_us",
+    label:"Why Plan With Us",
+    value:"Why_Plan_With_Us"
   },
   {
     id:"about_us",
@@ -99,3 +99,16 @@ export const CONTENT_FILTER_TABS=[
     value:"About_Us"
   }
 ] 
+
+export const WHY_CHOOSE_US_ICONS = [
+    { label: "Mountain", value: "mountain", component: "Mountain" },
+    { label: "Shield", value: "shield", component: "Shield" },
+    { label: "Globe", value: "globe", component: "Globe" },
+    { label: "Award", value: "award", component: "Award" },
+    { label: "Users", value: "users", component: "Users" },
+    { label: "Clock", value: "clock", component: "Clock" },
+    { label: "Star", value: "star", component: "Star" },
+    { label: "Heart", value: "heart", component: "Heart" },
+    { label: "Compass", value: "compass", component: "Compass" },
+    { label: "Map", value: "map", component: "Map" },
+] as const;

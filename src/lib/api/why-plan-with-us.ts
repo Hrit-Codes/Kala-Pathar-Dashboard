@@ -1,10 +1,11 @@
-import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
+
+import type { IWhyPlanWithUsItem, WhyPlanWithUsFormValues } from "@/src/types/why-plan-with-us";
 import { api } from "./api";
 
 export interface IWhyChooseUsResponse {
     success: boolean;
     message: string;
-    data: IWhyChooseUsItem[];
+    data: IWhyPlanWithUsItem[];
 }
 
 // Add utility for retry logic with exponential backoff
@@ -30,16 +31,19 @@ async function fetchWithRetry<T>(
     }
 }
 
-export const getWhyChooseUs = async (): Promise<IWhyChooseUsResponse> => {
+export const getWhyPlanWithUs = async (): Promise<IWhyChooseUsResponse> => {
     return fetchWithRetry(async () => {
         const { data } = await api.get("/whyChooseUs/getAll");
         return data;
     });
 };
 
-export const updateWhyChooseUs = async (id: string, formData: FormData): Promise<IWhyChooseUsResponse> => {
-    const { data } = await api.put(`/whyChooseUs/update/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-    });
-    return data; // Return the full response, not just data.data
+export const updateWhyPlanWithUs = async (id: string, data: WhyPlanWithUsFormValues) => {
+    const { data: res } = await api.put(`/whychooseus/update/${id}`, data);
+    return res;
+};
+
+export const createWhyPlanWithUs = async (data: WhyPlanWithUsFormValues) => {
+    const { data: res } = await api.post("/whychooseus/create", data);
+    return res;
 };

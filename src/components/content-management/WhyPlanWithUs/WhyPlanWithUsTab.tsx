@@ -1,9 +1,10 @@
 import { ArrowUpDown, CalendarDays, ImageIcon } from "lucide-react";
-import type { IWhyChooseUsItem } from "@/src/types/why-choose-us";
-import UpdateWhyChooseUsItemButton from "./UpdateWhyChooseUsItemButton";
-import NewWhyChooseUsItemButton from "./NewWhyChooseUsItemButton";
+import UpdateWhyChooseUsItemButton from "./UpdateWhyPlanWithUsButton";
+import * as LucideIcons from "lucide-react";
+import NewWhyPlanWithUsItemButton from "./NewWhyPlanWithUsItemButton";
+import type { IWhyPlanWithUsItem } from "@/src/types/why-plan-with-us";
 
-export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
+export default  function WhyPlanWithUsTab({items}:{items:IWhyPlanWithUsItem[]}){
     const isFull=items.length===3;
     return(
         <div className="w-full min-h-screen flex flex-col gap-6">
@@ -20,17 +21,24 @@ export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
 
             {/* Gallery Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {items.map((item) => (
+                {items.map((item) => {
+                    const SelectedIcon = item.icon
+                        ? (LucideIcons as any)[item.icon.charAt(0).toUpperCase() + item.icon.slice(1)]
+                        : null;
+                    return(
                     <div
                         key={item._id}
                         className="card p-0 flex flex-col overflow-hidden"
                     >
                         {/* Content */}
                         <div className="h-full p-5 flex flex-col justify-between gap-2">
-                            <div className="flex flex-col gap-2">
-                                <span className="text-[11px] font-bold tracking-wider uppercase text-primary-700">
-                                    {item.title}
-                                </span>
+                            <div className="flex flex-col gap-5">
+                                <div className="flex items-center gap-6">
+                                    {SelectedIcon && <SelectedIcon size={30} className="text-primary-600" />}
+                                    <span className="text-[11px] font-bold tracking-wider uppercase text-primary-700">
+                                        {item.title}
+                                    </span>
+                                </div>
                                 <p className="text-sm text-neutral-500 ">
                                     {item.description}
                                 </p>
@@ -46,16 +54,16 @@ export default  function WhyChooseUsTab({items}:{items:IWhyChooseUsItem[]}){
                                     <ArrowUpDown size={12} />
                                     <span>Updated {new Date(item.updatedAt).toLocaleDateString()}</span>
                                 </div>
-                                <UpdateWhyChooseUsItemButton item={item as IWhyChooseUsItem}/>
+                                <UpdateWhyChooseUsItemButton item={item as IWhyPlanWithUsItem}/>
                             </div>
 
                         </div>
                     </div>
-                ))}
+                )})}
 
                 {/* Empty slot placeholder when not full */}
                 {!isFull && (
-                        <NewWhyChooseUsItemButton />
+                        <NewWhyPlanWithUsItemButton />
                 )}
             </div>
         </div>

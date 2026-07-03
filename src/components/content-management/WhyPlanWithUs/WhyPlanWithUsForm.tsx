@@ -1,96 +1,81 @@
 "use client"
 
 import { RefreshCcw } from "lucide-react"
-import ImageDropzone from "../ui/ImageDropZone"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useEffect } from "react"
-import type { GalleryFormValues, GalleryItem } from "@/src/types/gallery"
-import { gallerySchema } from "@/src/lib/vallidators/gallery.validate"
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { createGalleryItem, updateGalleryItem } from "@/src/lib/api/gallery"
+import type { IWhyPlanWithUsItem, WhyPlanWithUsFormValues } from "@/src/types/why-plan-with-us"
+import { whyPlanWithUsSchema } from "@/src/lib/vallidators/why-plan-with-us"
+import IconPicker from "../../ui/IconPicker"
+import { createWhyPlanWithUs, updateWhyPlanWithUs } from "@/src/lib/api/why-plan-with-us"
 
-interface GalleryFormProps{
+interface WhyChooseUsFormProps{
     setIsFormOpen:(state:boolean)=>void
-    item?:GalleryItem
+    item?:IWhyPlanWithUsItem
 }
 
-export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
+export default function WhyPlanWithUsForm({setIsFormOpen, item}:WhyChooseUsFormProps){
     const router=useRouter();
 
     const {
         register,
         handleSubmit,
-        control,
         reset,
+        control,
         formState: { errors },
-    } = useForm<GalleryFormValues>({
-        resolver: zodResolver(gallerySchema) as any,
+    } = useForm<WhyPlanWithUsFormValues>({
+        resolver: zodResolver(whyPlanWithUsSchema) as any,
         defaultValues: {
             title: "",
-            subtitle: "",
             description: "",
+            icon:"",
             order: 1,
         } ,
     });
 
     const updateMutation=useMutation({
-        mutationFn:({id,formData}:{id:string, formData:FormData})=>updateGalleryItem(id,formData),
+        mutationFn:({id,data}:{id:string, data:WhyPlanWithUsFormValues})=>updateWhyPlanWithUs(id,data),
         onSuccess:()=>{
-            toast.success("Gallery item updated successfully"),
+            toast.success("Why plan with us item updated successfully"),
             setIsFormOpen(false),
             router.refresh();
         },
         onError:(error:any)=>{
-            const message = error.response?.data?.message || "Failed to update gallery item info";
+            const message = error.response?.data?.message || "Failed to update why plan with us info";
             toast.error(message);
             
         }
     })
 
     const createMutation=useMutation({
-        mutationFn:(formData:FormData)=>createGalleryItem(formData),
+        mutationFn:(data:WhyPlanWithUsFormValues)=>createWhyPlanWithUs(data),
         onSuccess:()=>{
-            toast.success("Gallery item added successfully"),
+            toast.success("Why plan with us item added successfully"),
             setIsFormOpen(false);
             router.refresh();
         },
         onError:(error:any)=>{
-            const message=error.response?.data?.message || "Faled to add gallery item";
+            const message=error.response?.data?.message || "Faled to add why plan with us item";
             toast.error(message)
         }
     })
 
-    const onSubmit=(values:GalleryFormValues)=>{
-        const formData= new FormData();
-        if(values.image){
-            formData.append("image",values.image);
-        }else if(!item){
-            toast.success("Please select an image");
-            return;
+    const onSubmit = (values: WhyPlanWithUsFormValues) => {
+        if (item) {
+            updateMutation.mutate({ id: item._id, data: values });
+        } else {
+            createMutation.mutate(values);
         }
-        formData.append("title",values.title);
-        formData.append("subtitle",values.subtitle);
-        formData.append("description",values.description);
-
-        if(values.order!==undefined)
-            formData.append("order",String(values.order));
-
-        if(item){
-            updateMutation.mutate({id:item._id,formData})
-        }else{
-            createMutation.mutate(formData)
-        }
-    }
+    };
 
     const handleReset=()=>{
         reset({
             title:"",
-            subtitle:"",
             description:"",
-            order:1,
+            order:1
         });
     }
 
@@ -98,7 +83,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
         if(item){
             reset({
                 title:item.title,
-                subtitle:item.subtitle,
+                icon:item.icon,
                 description:item.description,
                 order:item.order,
             })
@@ -111,25 +96,11 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                 <div onClick={()=>setIsFormOpen(false)} className="fixed inset-0 z-50 flex justify-center items-center bg-black/80 backdrop-blur-sm">
                     <div onClick={(e)=>e.stopPropagation()} className="card w-full max-w-xl max-h-[90vh] overflow-y-auto">
                         <div className="bg-primary-700 p-4 text-center text-white">
-                            <h2 className="text-white">{item?"Update Gallery Item":"Add Gallery Item"}</h2>
+                            <h2 className="text-white">{item?"Update Why Choose Us Item":"Add Why Choose Us Item"}</h2>
                             <p className="text-white">Editor Mode</p>
                         </div>
 
                         <form onSubmit={handleSubmit(onSubmit)} className="w-full p-6 flex flex-col gap-6">
-                            <Controller name="image" control={control} render={({field})=>(
-                                <div className="flex flex-col gap-1">
-                                    <ImageDropzone value={field.value?? null}
-                                    preview={item?.image}
-                                    onChange={(file)=>field.onChange(file)}
-                                    label="Gallery Image"
-                                    />
-                                    {errors.image && (
-                                        <p className="text-xs text-red-500">{errors.image.message}</p>
-                                    )}
-                                </div>
-                            )}
-                            />
-                            <div>
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-bold text-neutral-500 tracking-wide">Title</label>
                                     <input
@@ -140,6 +111,20 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                         placeholder="e.g. Everest Base Camp at Dawn"
                                     />
                                     {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
+                                </div>
+                                <div className="flex flex-col gap-1.5">
+                                    <Controller
+                                        name="icon"
+                                        control={control}
+                                        render={({ field }) => (
+                                            <IconPicker
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                error={errors.icon?.message}
+                                            />
+                                        )}
+                                    />
+                                    {errors.icon && <p className="text-xs text-red-500">{errors.icon.message}</p>}
                                 </div>
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-bold text-neutral-500 tracking-wide">Order</label>
@@ -153,18 +138,8 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                     />
                                     {errors.order && <p className="text-xs text-red-500">{errors.order.message}</p>}
                                 </div>
-                            </div>
                                 <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-bold text-neutral-500 tracking-wide">Subtitle</label>
-                                    <input
-                                        type="text"
-                                        className="input"
-                                        {...register("subtitle",{required:"Subtitle is required"})}
-                                    />
-                                    {errors.subtitle && <p className="text-xs text-red-500">{errors.subtitle.message}</p>}
-                                </div>
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-bold text-neutral-500 tracking-wide">Company Description</label>
+                                    <label className="text-xs font-bold text-neutral-500 tracking-wide">Description</label>
                                     <textarea
                                         rows={5}
                                         className="input leading-relaxed resize-none"
@@ -179,7 +154,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                         disabled={isPending}
                                         className="btn-primary whitespace-nowrap w-5/6"
                                     >   
-                                        {isPending?"Saving...":"Save Gallery Item"}
+                                        {isPending?"Saving...":"Save Why Choose Us Item"}
                                     </button>
 
                                     <button type="button" onClick={handleReset} disabled={isPending} title="Reset form" className="w-fit btn-secondary whitespace-nowrap flex items-center justify-center ">
