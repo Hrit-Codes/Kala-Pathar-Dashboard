@@ -2,7 +2,7 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 
-export default function NewGalleryButton(){
+export default function NewWhyChooseUsItemButton(){
     const [isFormOpen,setIsFormOpen]=useState(false);
     return(
         <>

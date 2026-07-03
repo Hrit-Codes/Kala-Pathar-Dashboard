@@ -5,12 +5,12 @@ import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { BackgroundEffects } from "@/src/components/layout/BackgroundEffects";
 import { useMutation } from "@tanstack/react-query";
-import { login } from "@/src/lib/auth";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { login } from "@/src/lib/api/auth";
 
 const loginSchema = z.object({
     email: z.string().trim().email("Invalid email address"),

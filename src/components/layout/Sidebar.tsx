@@ -8,7 +8,9 @@ import {
   MessageSquare, 
   Image as ImageIcon, 
   Info, 
-  Settings 
+  Settings, 
+  Building2,
+  FileText
 } from 'lucide-react';
 
 const menuItems = [
@@ -17,9 +19,8 @@ const menuItems = [
   { name: 'Destinations', href: '/dashboard/destinations', icon: Map },
   { name: 'Inquiries', href: '/dashboard/inquiries', icon: MessageSquare },
   { name: 'Gallery', href: '/dashboard/gallery', icon: ImageIcon },
-  { name: 'About Us', href: '/dashboard/about', icon: Info },
-  { name: 'Company Info', href: '/dashboard/companyinfo', icon: Info },
-  { name: "Content Management", href:"/dashboard/contentManagement",icon:Info},
+  { name: 'Company Info', href: '/dashboard/companyinfo', icon: Building2 },
+  { name: "Content Management", href:"/dashboard/contentManagement",icon:FileText},
 ];
 
 export default function Sidebar() {

@@ -1,6 +1,6 @@
 "use client";
 import { PageLoader } from "@/src/components/ui/PageLoader";
-import { getCompanyInfo, updateCompanyInfo, type ICompanyInfo } from "@/src/lib/company-info";
+import { getCompanyInfo, updateCompanyInfo, type ICompanyInfo } from "@/src/lib/api/company-info";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     Building2,

@@ -1,9 +1,9 @@
 import PageHeader from "@/src/components/layout/PageHeader";
 import NewGalleryButton from "@/src/components/gallery/NewGalleryButton";
 import UpdateGalleryItemButton from "@/src/components/gallery/UpdateGalleryItemButton";
-import { getGallery } from "@/src/lib/gallery";
 import type { GalleryItem } from "@/src/types/gallery";
 import { ImageIcon, CalendarDays, ArrowUpDown } from "lucide-react";
+import { getGallery } from "@/src/lib/api/gallery";
 
 
 export default async function GalleryPage() {
