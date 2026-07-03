@@ -86,3 +86,16 @@ export const INQUIRY_FILTER_TABS=[
         value:"Replied"
     }
 ]
+
+export const CONTENT_FILTER_TABS=[
+  {
+    id:"why_choose_us",
+    label:"Why Choose Us",
+    value:"Why_Choose_Us"
+  },
+  {
+    id:"about_us",
+    label:"About Us",
+    value:"About_Us"
+  }
+] 

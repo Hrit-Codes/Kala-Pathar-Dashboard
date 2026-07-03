@@ -106,7 +106,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                 <div onClick={()=>setIsFormOpen(false)} className="fixed inset-0 z-50 flex justify-center items-center bg-black/80 backdrop-blur-sm">
                     <div onClick={(e)=>e.stopPropagation()} className="card w-full max-w-xl max-h-[90vh] overflow-y-auto">
                         <div className="bg-primary-700 p-4 text-center text-white">
-                            <h2 className="text-white">Add New Gallery Item</h2>
+                            <h2 className="text-white">{item?"Update Gallery Item":"Add Gallery Item"}</h2>
                             <p className="text-white">Editor Mode</p>
                         </div>
 
