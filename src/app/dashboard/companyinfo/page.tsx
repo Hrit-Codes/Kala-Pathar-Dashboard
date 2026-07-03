@@ -1,5 +1,5 @@
 import PageHeader from "@/src/components/layout/PageHeader";
-import CompanyInfoForm from "@/src/components/ServerComponent/CompanyInfoForm";
+import CompanyInfoForm from "@/src/components/company-info/CompanyInfoForm";
 import { getCompanyInfo } from "@/src/lib/company-info";
 
 export default async function CompanyInfoPage() {
