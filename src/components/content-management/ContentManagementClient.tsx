@@ -7,16 +7,19 @@ import AboutUsTab from "./AboutUs/AboutUsTab";
 import type { IAboutUs } from "@/src/types/about-us";
 import WhyPlanWithUsTab from "./WhyPlanWithUs/WhyPlanWithUsTab";
 import type { IWhyPlanWithUsItem } from "@/src/types/why-plan-with-us";
-import AffiliationsTab from "./Affiliations/AffiliationsTab";
+import AffiliationsTab from "./Partner/PartnersTab";
+import type { IPartnerSection } from "@/src/types/partner";
+import PartnersTab from "./Partner/PartnersTab";
 
 type ContentTab = "About_Us" | "Why_Plan_With_Us" | "Affiliations";
 
 type ContentManagementClientProps={
     initialWhyPlanWithUs:IWhyPlanWithUsItem[],
-    initialAboutUs:IAboutUs
+    initialAboutUs:IAboutUs,
+    initialPartner:IPartnerSection;
 }
 
-export default function ContentManagementClient({initialWhyPlanWithUs, initialAboutUs}:ContentManagementClientProps) {
+export default function ContentManagementClient({initialWhyPlanWithUs, initialAboutUs, initialPartner}:ContentManagementClientProps) {
     const [activeTab, setActiveTab] = useState<ContentTab>("Why_Plan_With_Us");
     const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
     const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -74,7 +77,7 @@ export default function ContentManagementClient({initialWhyPlanWithUs, initialAb
             {/* Render tabs */}
             {activeTab === "Why_Plan_With_Us" && <WhyPlanWithUsTab items={initialWhyPlanWithUs } />}
             {activeTab === "About_Us" && <AboutUsTab initialData={initialAboutUs } />}
-            {activeTab === "Affiliations" && <AffiliationsTab />}
+            {activeTab === "Affiliations" && <PartnersTab initialData={initialPartner} />}
         </div>
     );
 }

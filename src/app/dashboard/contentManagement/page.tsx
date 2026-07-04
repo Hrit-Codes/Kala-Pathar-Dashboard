@@ -1,18 +1,21 @@
 import ContentManagementClient from '@/src/components/content-management/ContentManagementClient';
 import { getAboutUs } from '@/src/lib/api/about-us';
+import { getPartnerSection } from '@/src/lib/api/partner';
 import { getWhyPlanWithUs } from '@/src/lib/api/why-plan-with-us';
 import type { IAboutUs } from '@/src/types/about-us';
+import type { IPartnerSection } from '@/src/types/partner';
 import type { IWhyPlanWithUsItem } from '@/src/types/why-plan-with-us';
 
 export default async function ContentManagementPage() {
     const whyPlanWithUsData = await getWhyPlanWithUs();
     const aboutUsData = await getAboutUs(); 
+    const partnerData= await getPartnerSection();
 
     return (
         <ContentManagementClient 
             initialWhyPlanWithUs={whyPlanWithUsData.data as IWhyPlanWithUsItem[]} 
             initialAboutUs={aboutUsData.data as IAboutUs}
-            // initialAboutUs={aboutUsData.data}
+            initialPartner={partnerData as IPartnerSection }
         />
     );
 }
