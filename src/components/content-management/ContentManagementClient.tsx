@@ -7,7 +7,6 @@ import AboutUsTab from "./AboutUs/AboutUsTab";
 import type { IAboutUs } from "@/src/types/about-us";
 import WhyPlanWithUsTab from "./WhyPlanWithUs/WhyPlanWithUsTab";
 import type { IWhyPlanWithUsItem } from "@/src/types/why-plan-with-us";
-import AffiliationsTab from "./Partner/PartnersTab";
 import type { IPartnerSection } from "@/src/types/partner";
 import PartnersTab from "./Partner/PartnersTab";
 
