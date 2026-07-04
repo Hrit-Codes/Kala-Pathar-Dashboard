@@ -7,8 +7,9 @@ import AboutUsTab from "./AboutUs/AboutUsTab";
 import type { IAboutUs } from "@/src/types/about-us";
 import WhyPlanWithUsTab from "./WhyPlanWithUs/WhyPlanWithUsTab";
 import type { IWhyPlanWithUsItem } from "@/src/types/why-plan-with-us";
+import AffiliationsTab from "./Affiliations/AffiliationsTab";
 
-type ContentTab = "About_Us" | "Why_Plan_With_Us";
+type ContentTab = "About_Us" | "Why_Plan_With_Us" | "Affiliations";
 
 type ContentManagementClientProps={
     initialWhyPlanWithUs:IWhyPlanWithUsItem[],
@@ -73,6 +74,7 @@ export default function ContentManagementClient({initialWhyPlanWithUs, initialAb
             {/* Render tabs */}
             {activeTab === "Why_Plan_With_Us" && <WhyPlanWithUsTab items={initialWhyPlanWithUs } />}
             {activeTab === "About_Us" && <AboutUsTab initialData={initialAboutUs } />}
+            {activeTab === "Affiliations" && <AffiliationsTab />}
         </div>
     );
 }

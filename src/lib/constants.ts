@@ -97,6 +97,11 @@ export const CONTENT_FILTER_TABS=[
     id:"about_us",
     label:"About Us",
     value:"About_Us"
+  },
+  {
+    id:"affiliations",
+    label:"Affiliations",
+    value:"Affiliations"
   }
 ] 
 
