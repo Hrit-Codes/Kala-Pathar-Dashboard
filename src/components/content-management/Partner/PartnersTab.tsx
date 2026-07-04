@@ -1,13 +1,14 @@
 "use client";
 
 import { LayoutTemplate, ShieldCheck, Tag, Plus, Clock, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PartnerForm from "./AffiliationForm"; 
 import type { IPartnerSection } from "@/src/types/partner";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { addAffiliation, deleteAffiliation, updateAffiliation, updatePartnerSection } from "@/src/lib/api/partner";
 import { toast } from "sonner";
+import { PageLoader } from "../../ui/PageLoader";
 
 const MIN_AFFILIATIONS = 3;
 const MAX_AFFILIATIONS = 5;
@@ -23,37 +24,54 @@ interface AffiliationItem {
     _newLogo?: File | null;
 }
 
-const mockBadges = [
-    "Government Registered",
-    "Eco-Tourism Certified",
-    "Sustainable Travel",
-    "Expert Local Guides",
-    "24/7 Field Support",
-];
 
 export default function PartnersTab({initialData}:{initialData:IPartnerSection}) {
     const router= useRouter();
+    const [isLoading, setIsLoading]=useState(!initialData);
+    console.log(initialData);
 
     //Section states
-    const [sectionTitle,   setSectionTitle]   = useState("Our Affiliations");
-    const [sectionTagline, setSectionTagline] = useState("Trusted by leading industry organizations");
-    const [badges,         setBadges]         = useState(mockBadges);
+    const [sectionTitle,   setSectionTitle]   = useState(initialData?.sectionTitle);
+    const [sectionTagline, setSectionTagline] = useState(initialData?.sectionTagline);
+    const [badges,         setBadges]         = useState(initialData?.badges || []);
     const [newBadge,       setNewBadge]       = useState("");
     const [isSectionDirty, setIsSectionDirty] = useState(false);
 
-    const [affiliations, setAffiliations]=useState<AffiliationItem[]>(
-        initialData.affiliations.map((a)=>({
-            _id:a._id,
-            abbreviation:a.abbreviation,
-            name:a.name,
-            logo:a.logo,
-            order:a.order
-        }))
-    )
+    const [affiliations, setAffiliations] = useState<AffiliationItem[]>(() => {
+        if (!initialData?.affiliations) return [];
+        return initialData.affiliations.map((a) => ({
+            _id: a._id,
+            abbreviation: a.abbreviation,
+            name: a.name,
+            logo: a.logo,
+            order: a.order
+        }));
+    });
 
     const [editingId, setEditingId]=useState<string | null>(null);
     const [editDraft, setEditDraft]=useState<Partial<AffiliationItem>>({});
     const [logoPreview, setLogoPreview]=useState<string>("");
+
+    // Sync data if initialData changes
+    useEffect(()=>{
+        if(initialData){
+            setSectionTitle(initialData.sectionTitle);
+            setSectionTagline(initialData.sectionTagline);
+
+            setBadges(initialData.badges || []);
+
+            if(initialData.affiliations){
+                setAffiliations(initialData.affiliations.map((a)=>({
+                    _id:a._id,
+                    abbreviation:a.abbreviation,
+                    name:a.name,
+                    logo:a.logo,
+                    order:a.order
+                })))
+            }
+            setIsLoading(false);
+        }
+    },[initialData])
 
     const canDeleteAffiliation = affiliations.length > MIN_AFFILIATIONS;
     const canAddAffiliation    = affiliations.length < MAX_AFFILIATIONS;
@@ -201,6 +219,12 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
     };
 
     const isPending=updateAffiliationMutation.isPending || addAffiliationMutation.isPending || deleteAffiliationMutation.isPending;
+
+    if(isLoading){
+        return(
+            <PageLoader/>
+        )
+    }
 
     return (
         <div className="w-full flex flex-col gap-6 pb-24">
