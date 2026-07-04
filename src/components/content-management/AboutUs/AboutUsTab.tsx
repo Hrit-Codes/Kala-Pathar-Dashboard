@@ -5,8 +5,8 @@ import type { IAboutUs } from "@/src/types/about-us";
 import { useMutation } from "@tanstack/react-query";
 import { Building2, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface CompanyInfoFormValues {
@@ -35,7 +35,7 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
     const [isCEODirty, setIsCEODirty] = useState(false);
 
     
-    const { register, handleSubmit, formState: { errors, isDirty } } = useForm<CompanyInfoFormValues>({
+    const { register, handleSubmit, formState: { errors, isDirty },control, reset } = useForm<CompanyInfoFormValues>({
             defaultValues: {
                 heading: initialData?.heading || "",
                 tagline: initialData?.tagline || "",
@@ -55,6 +55,21 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                 ]
             }
         });
+
+    const {fields}=useFieldArray({
+        control,
+        name:"stats"
+    })
+
+    useEffect(()=>{
+        reset({
+            heading:initialData?.heading || "",
+            tagline:initialData.tagline || "",
+            description:initialData.description || "",
+            ceoQuote: initialData.ceoQuote || { quoteText:'', ceoName:"", ceoTitle:""},
+            stats:initialData?.stats || []
+        })
+    },[initialData,reset])
 
     const handleHeroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -111,7 +126,10 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
         formData.append("ceoQuote[ceoName]",data.ceoQuote.ceoName);
         formData.append("ceoQuote[ceoTitle]",data.ceoQuote.ceoTitle);
 
-        data.stats.forEach((stat, idx) => {
+        const formStats=data.stats;
+        console.log(formStats);
+
+        formStats.forEach((stat, idx) => {
             formData.append(`stats[${idx}][label]`, stat.label);
             formData.append(`stats[${idx}][value]`, stat.value);
         });
@@ -124,9 +142,9 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
         }
 
         if(initialData){
-            updateAboutUs(formData);
+            updateMutation.mutate(formData);
         }else{
-            createAboutUs(formData);
+            createMutation.mutate(formData);
         }
 
     }
@@ -205,8 +223,8 @@ export default function AboutUsTab({initialData}:{initialData:IAboutUs}){
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                                {initialData.stats.map((stat,index)=>(
-                                    <div key={index} className="flex flex-col gap-2 p-4 card">
+                                {fields.map((field,index)=>(
+                                    <div key={field.id} className="flex flex-col gap-2 p-4 card">
                                         <input
                                             type="text"
                                             className="input bg-white font-semibold text-neutral-800"
