@@ -1,6 +1,8 @@
 "use client";
 import { PageLoader } from "@/src/components/ui/PageLoader";
-import { getCompanyInfo, updateCompanyInfo, type ICompanyInfo } from "@/src/lib/api/company-info";
+import { createCompanyInfo, getCompanyInfo, updateCompanyInfo, type ICompanyInfo } from "@/src/lib/api/company-info";
+import { companyInfoSchema } from "@/src/lib/vallidators/company.validate";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     Building2,
@@ -49,33 +51,36 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
 
     const { data: companyInfo, isLoading } = useQuery({
         queryKey: ["company-info"],
-        queryFn: getCompanyInfo
+        queryFn: getCompanyInfo,
+        initialData:initialData ?? undefined
     });
 
-    const { register, handleSubmit, reset, control, formState: { errors, isDirty } } = useForm<CompanyInfoFormValues>({
-        defaultValues: {
-            companyName: initialData?.companyName || "",
-            description: initialData?.description || "",
-            officeAddress: initialData?.officeAddress || "",
-            officeTelephone: initialData?.officeTelephone || "",
-            emails: initialData?.emails && initialData.emails.length > 0
-                ? initialData.emails.map((e) => ({ value: e }))
-                : [{ value: "" }],
-            phones: initialData?.phones && initialData.phones.length > 0
-                ? initialData.phones.map((p) => ({ value: p }))
-                : [{ value: "" }],
-            mapLatitude: initialData?.mapLatitude !== undefined ? String(initialData.mapLatitude) : "",
-            mapLongitude: initialData?.mapLongitude !== undefined ? String(initialData.mapLongitude) : "",
-            mapEmbedUrl: initialData?.mapEmbedUrl || "",
-            socialLinks: {
-                facebook: initialData?.socialLinks?.facebook || "",
-                instagram: initialData?.socialLinks?.instagram || "",
-                linkedin: initialData?.socialLinks?.linkedin || "",
-                twitter: initialData?.socialLinks?.twitter || "",
-                youtube: initialData?.socialLinks?.youtube || "",
-            }
-        }
-    });
+     const { register, handleSubmit, reset, control, formState: { errors, isDirty } } =
+        useForm<CompanyInfoFormValues>({
+            resolver: zodResolver(companyInfoSchema),
+            defaultValues: {
+                companyName: initialData?.companyName || "",
+                description: initialData?.description || "",
+                officeAddress: initialData?.officeAddress || "",
+                officeTelephone: initialData?.officeTelephone || "",
+                emails: initialData?.emails && initialData.emails.length > 0
+                    ? initialData.emails.map((e) => ({ value: e }))
+                    : [{ value: "" }],
+                phones: initialData?.phones && initialData.phones.length > 0
+                    ? initialData.phones.map((p) => ({ value: p }))
+                    : [{ value: "" }],
+                mapLatitude: initialData?.mapLatitude !== undefined ? String(initialData.mapLatitude) : "",
+                mapLongitude: initialData?.mapLongitude !== undefined ? String(initialData.mapLongitude) : "",
+                mapEmbedUrl: initialData?.mapEmbedUrl || "",
+                socialLinks: {
+                    facebook: initialData?.socialLinks?.facebook || "",
+                    instagram: initialData?.socialLinks?.instagram || "",
+                    linkedin: initialData?.socialLinks?.linkedin || "",
+                    twitter: initialData?.socialLinks?.twitter || "",
+                    youtube: initialData?.socialLinks?.youtube || "",
+                },
+            },
+        });
 
     // Automatically watch the live map Embed URL field from React Hook Form
     const liveMapEmbedUrl = useWatch({
@@ -136,6 +141,19 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
         }
     });
 
+    const createMutation = useMutation({
+        mutationFn: createCompanyInfo,
+        onSuccess: () => {
+            toast.success("Company info created successfully");
+            setIsLogoDirty(false);
+            queryClient.invalidateQueries({ queryKey: ["company-info"] });
+        },
+        onError: (error: any) => {
+            const message = error.response?.data?.message || "Failed to create company info";
+            toast.error(message);
+        }
+    });
+
     const onSubmit = (values: CompanyInfoFormValues) => {
         const formData = new FormData();
 
@@ -156,7 +174,11 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
             formData.append("logo", logoFile);
         }
 
-        updateMutation.mutate(formData);
+        if(companyInfo){
+            updateMutation.mutate(formData);
+        }else{
+            createMutation.mutate(formData);
+        }
     };
 
     const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,10 +205,10 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                     <div className="flex items-center gap-3">
                         <button
                             type="submit"
-                            disabled={!hasChanges || updateMutation.isPending}
+                            disabled={!hasChanges || updateMutation.isPending || createMutation.isPending}
                             className="btn-primary whitespace-nowrap"
                         >
-                            {updateMutation.isPending ? "Updating..." : "Update Information"}
+                            {companyInfo? updateMutation.isPending ? "Updating..." : "Update Information":createMutation.isPending?"Adding":"Add Information"}
                         </button>
                     </div>
                 </div>
@@ -224,6 +246,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             type="text"
                                             {...register("companyName", { required: "Company name is required" })}
                                             disabled={updateMutation.isPending}
+                                            placeholder="Enter company name"
                                             className="input"
                                         />
                                         {errors.companyName && <p className="text-xs text-red-500">{errors.companyName.message}</p>}
@@ -235,6 +258,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             rows={5}
                                             {...register("description")}
                                             disabled={updateMutation.isPending}
+                                            placeholder="Describe your company..."
                                             className="input leading-relaxed resize-none"
                                         />
                                     </div>
@@ -259,6 +283,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                                 type="email"
                                                 {...register(`emails.${index}.value` as const)}
                                                 disabled={updateMutation.isPending}
+                                                placeholder={`email${index + 1}@example.com`}
                                                 className="input pl-11 flex-1"
                                             />
                                             {emailFields.length > 1 && (
@@ -290,6 +315,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                                 type="text"
                                                 {...register(`phones.${index}.value` as const)}
                                                 disabled={updateMutation.isPending}
+                                                placeholder={`+977-98${index + 1}-${String(1234567 + index).padStart(4, '0')}`}
                                                 className="input pl-11 flex-1"
                                             />
                                             {phoneFields.length > 1 && (
@@ -317,7 +343,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             type="text"
                                             {...register("officeTelephone")}
                                             disabled={updateMutation.isPending}
-                                            placeholder="Office Telephone"
+                                            placeholder="+977-1-4XXXXXX"
                                             className="input pl-11 w-full"
                                         />
                                     </div>
@@ -342,6 +368,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                         type="text"
                                         {...register("officeAddress", { required: "Office address is required" })}
                                         disabled={updateMutation.isPending}
+                                        placeholder="Putalisadak, Kathmandu, Nepal"
                                         className="input"
                                     />
                                     {errors.officeAddress && <p className="text-xs text-red-500">{errors.officeAddress.message}</p>}
@@ -354,6 +381,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             type="text"
                                             {...register("mapLatitude")}
                                             disabled={updateMutation.isPending}
+                                            placeholder="27.7172"
                                             className="input"
                                         />
                                     </div>
@@ -363,6 +391,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             type="text"
                                             {...register("mapLongitude")}
                                             disabled={updateMutation.isPending}
+                                            placeholder="85.3240"
                                             className="input"
                                         />
                                     </div>
@@ -374,6 +403,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                         type="text"
                                         {...register("mapEmbedUrl")}
                                         disabled={updateMutation.isPending}
+                                        placeholder="https://www.google.com/maps/embed?pb=..."
                                         className="input"
                                     />
                                 </div>
@@ -394,7 +424,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                     ) : (
                                         <div className="w-full h-full flex flex-col items-center justify-center text-neutral-400 gap-2">
                                             <MapPin size={24} />
-                                            <span className="text-xs">No iframe content configured</span>
+                                            <span className="text-xs">Enter a Google Maps embed URL above</span>
                                         </div>
                                     )}
                                 </div>
@@ -410,12 +440,12 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
 
                             <div className="flex flex-col gap-3.5">
                                 {[
-                                    { key: "facebook", icon: <FaFacebook size={16} />, className: "bg-blue-50 text-blue-600 border-blue-100" },
-                                    { key: "instagram", icon: <FaInstagram size={16} />, className: "bg-pink-50 text-pink-600 border-pink-100" },
-                                    { key: "linkedin", icon: <FaLinkedinIn size={16} />, className: "bg-indigo-50 text-indigo-600 border-indigo-100" },
-                                    { key: "twitter", icon: <FaTwitter size={16} />, className: "bg-neutral-50 text-neutral-800 border-neutral-200" },
-                                    { key: "youtube", icon: <FaYoutube size={16} />, className: "bg-red-50 text-red-600 border-red-100" },
-                                ].map(({ key, icon, className }) => (
+                                    { key: "facebook", icon: <FaFacebook size={16} />, className: "bg-blue-50 text-blue-600 border-blue-100", placeholder: "facebook.com/yourpage" },
+                                    { key: "instagram", icon: <FaInstagram size={16} />, className: "bg-pink-50 text-pink-600 border-pink-100", placeholder: "instagram.com/yourpage" },
+                                    { key: "linkedin", icon: <FaLinkedinIn size={16} />, className: "bg-indigo-50 text-indigo-600 border-indigo-100", placeholder: "linkedin.com/company/yourpage" },
+                                    { key: "twitter", icon: <FaTwitter size={16} />, className: "bg-neutral-50 text-neutral-800 border-neutral-200", placeholder: "twitter.com/yourpage" },
+                                    { key: "youtube", icon: <FaYoutube size={16} />, className: "bg-red-50 text-red-600 border-red-100", placeholder: "youtube.com/@yourpage" },
+                                ].map(({ key, icon, className, placeholder }) => (
                                     <div key={key} className="w-full flex items-center gap-3">
                                         <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 border ${className}`}>
                                             {icon}
@@ -425,7 +455,7 @@ export default function CompanyInfoForm({ initialData }: CompanyInfoFormProps) {
                                             {...register(`socialLinks.${key as keyof CompanyInfoFormValues["socialLinks"]}`)}
                                             disabled={updateMutation.isPending}
                                             className="w-full input py-2 px-2"
-                                            placeholder={`${key}.com/yourpage`}
+                                            placeholder={placeholder}
                                         />
                                     </div>
                                 ))}
