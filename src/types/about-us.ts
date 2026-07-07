@@ -28,3 +28,18 @@ export interface IAboutUsResponse {
     message: string;
     data: IAboutUs;
 }
+
+export interface AboutUsFormValues {
+    heading: string;
+    tagline: string;
+    description: string;
+    ceoQuote: {
+        quoteText: string;
+        ceoName: string;
+        ceoTitle: string;
+    };
+    stats: {
+        label: string;
+        value: string;
+    }[];
+}
