@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { addAffiliation, deleteAffiliation, updateAffiliation, updatePartnerSection } from "@/src/lib/api/partner";
 import { toast } from "sonner";
-import { PageLoader } from "../../ui/PageLoader";
 
 const MIN_AFFILIATIONS = 3;
 const MAX_AFFILIATIONS = 5;
@@ -27,7 +26,6 @@ interface AffiliationItem {
 
 export default function PartnersTab({initialData}:{initialData:IPartnerSection | null}) {
     const router= useRouter();
-    const [isLoading, setIsLoading]=useState(!initialData);
 
     //Section states
     const [sectionTitle,   setSectionTitle]   = useState(initialData?.sectionTitle || "");
@@ -68,7 +66,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                     order:a.order
                 })))
             }
-            setIsLoading(false);
         }
     },[initialData])
 
@@ -218,11 +215,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
 
     const isPending=updateAffiliationMutation.isPending || addAffiliationMutation.isPending || deleteAffiliationMutation.isPending;
 
-    if(isLoading){
-        return(
-            <PageLoader/>
-        )
-    }
 
     const hasInitialData=!!initialData;
 

@@ -1,7 +1,9 @@
 "use client"
 
 import { createAboutUs, updateAboutUs } from "@/src/lib/api/about-us";
-import type { IAboutUs } from "@/src/types/about-us";
+import { aboutUsSchema } from "@/src/lib/vallidators/about-us.validate";
+import type { AboutUsFormValues, IAboutUs } from "@/src/types/about-us";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Building2, Pencil } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -9,27 +11,6 @@ import { useEffect, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-interface AboutUsFormValues {
-    heading: string;
-    tagline: string;
-    description: string;
-    ceoQuote: {
-        quoteText: string;
-        ceoName: string;
-        ceoTitle: string;
-    };
-    stats: {
-        label: string;
-        value: string;
-    }[];
-}
-
-const DEFAULT_STATS = [
-    { label: "Happy Travellers", value: "" },
-    { label: "Years of Experience", value: "" },
-    { label: "Expert Local Guides", value: "" },
-    { label: "Curated Packages", value: "" },
-];
 
 export default function AboutUsTab({ initialData }: { initialData: IAboutUs | null }) {
     const router = useRouter();
@@ -43,6 +24,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
 
     const { register, handleSubmit, formState: { errors, isDirty }, control, reset } =
         useForm<AboutUsFormValues>({
+            resolver:zodResolver(aboutUsSchema),
             defaultValues: {
                 heading: initialData?.heading || "",
                 tagline: initialData?.tagline || "",
@@ -54,7 +36,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                 },
                 stats: initialData?.stats && initialData.stats.length > 0
                     ? initialData.stats
-                    : DEFAULT_STATS,
+                    : Array(4).fill({ label: "", value: "" }),
             },
         });
 
@@ -75,7 +57,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
             },
             stats: initialData?.stats && initialData.stats.length > 0
                 ? initialData.stats
-                : DEFAULT_STATS,
+                : Array(4).fill({ label: "", value: "" }),
         });
         setHeroPreview(initialData?.heroImage || "");
         setCEOPreview(initialData?.ceoQuote?.ceoPhoto || "");
@@ -191,6 +173,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     type="text"
                                     className="input"
                                     disabled={isPending}
+                                    placeholder="e.g. About Kala Patthar Expeditions"
                                     {...register("heading", { required: "Heading is required" })}
                                 />
                                 {errors.heading && <p className="text-xs text-red-500">{errors.heading.message}</p>}
@@ -202,6 +185,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     type="text"
                                     className="input"
                                     disabled={isPending}
+                                    placeholder="e.g. Elevating Your Journey Beyond the Horizon"
                                     {...register("tagline", { required: "Tagline is required" })}
                                 />
                                 {errors.tagline && <p className="text-xs text-red-500">{errors.tagline.message}</p>}
@@ -213,6 +197,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     rows={5}
                                     className="input leading-relaxed resize-none"
                                     disabled={isPending}
+                                    placeholder="Write a compelling description about your company, its mission, and what makes you unique..."
                                     {...register("description", { required: "Description is required" })}
                                 />
                                 {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
@@ -221,6 +206,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                     </div>
                 </div>
 
+                {/* CARD 2: Impact Metrics */}
                 <div className="card p-6 flex flex-col gap-5">
                     <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-4">
                         <Building2 size={20} className="text-primary-700" />
@@ -233,14 +219,20 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                 <input
                                     type="text"
                                     className="input bg-white font-semibold text-neutral-800"
-                                    placeholder="e.g. Happy Travelers"
+                                    placeholder={index === 0 ? "e.g. Happy Travelers" : 
+                                               index === 1 ? "e.g. Years of Experience" :
+                                               index === 2 ? "e.g. Expert Guides" :
+                                               "e.g. Curated Packages"}
                                     disabled={isPending}
                                     {...register(`stats.${index}.label` as const, { required: "Metric Label required" })}
                                 />
                                 <input
                                     type="text"
                                     className="input bg-white font-semibold text-neutral-800"
-                                    placeholder="e.g. 2,000+"
+                                    placeholder={index === 0 ? "e.g. 2,000+" :
+                                               index === 1 ? "e.g. 15+" :
+                                               index === 2 ? "e.g. 25+" :
+                                               "e.g. 50+"}
                                     disabled={isPending}
                                     {...register(`stats.${index}.value` as const, { required: "Metric value required" })}
                                 />
@@ -249,6 +241,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                     </div>
                 </div>
 
+                {/* CARD 3: CEO Leadership */}
                 <div className="card p-6 flex flex-col gap-5">
                     <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-4">
                         <Building2 size={20} className="text-primary-700" />
@@ -260,7 +253,7 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                             <span className="text-xs font-bold text-neutral-500 tracking-wide">CEO Photo</span>
                             <div className="relative h-28 w-28 rounded-2xl border border-neutral-200 bg-neutral-50/50 flex items-center justify-center p-3 overflow-hidden group">
                                 {CEOPreview ? (
-                                    <img src={CEOPreview} alt="companyLogo" className="w-full h-full object-contain" />
+                                    <img src={CEOPreview} alt="CEO Photo" className="w-full h-full object-contain" />
                                 ) : (
                                     <div className="text-xs text-neutral-400">No Image</div>
                                 )}
@@ -278,7 +271,8 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     type="text"
                                     className="input"
                                     disabled={isPending}
-                                    {...register("ceoQuote.ceoName", { required: "Ceo name is required" })}
+                                    placeholder="e.g. John Doe"
+                                    {...register("ceoQuote.ceoName", { required: "CEO name is required" })}
                                 />
                                 {errors.ceoQuote?.ceoName && <p className="text-xs text-red-500">{errors.ceoQuote.ceoName.message}</p>}
                             </div>
@@ -289,7 +283,8 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     type="text"
                                     className="input"
                                     disabled={isPending}
-                                    {...register("ceoQuote.ceoTitle", { required: "Ceo title is required" })}
+                                    placeholder="e.g. Founder & CEO"
+                                    {...register("ceoQuote.ceoTitle", { required: "CEO title is required" })}
                                 />
                                 {errors.ceoQuote?.ceoTitle && <p className="text-xs text-red-500">{errors.ceoQuote.ceoTitle.message}</p>}
                             </div>
@@ -300,7 +295,8 @@ export default function AboutUsTab({ initialData }: { initialData: IAboutUs | nu
                                     rows={5}
                                     className="input leading-relaxed resize-none"
                                     disabled={isPending}
-                                    {...register("ceoQuote.quoteText", { required: "Ceo quote is required" })}
+                                    placeholder="e.g. Travel is the only thing you buy that makes you richer. Every journey tells a story, and we're here to help you write yours."
+                                    {...register("ceoQuote.quoteText", { required: "CEO quote is required" })}
                                 />
                                 {errors.ceoQuote?.quoteText && <p className="text-red-500 text-xs">{errors.ceoQuote.quoteText.message}</p>}
                             </div>
