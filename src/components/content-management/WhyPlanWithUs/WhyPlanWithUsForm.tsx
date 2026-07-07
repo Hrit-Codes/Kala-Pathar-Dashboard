@@ -144,6 +144,7 @@ export default function WhyPlanWithUsForm({setIsFormOpen, item}:WhyChooseUsFormP
                                         rows={5}
                                         className="input leading-relaxed resize-none"
                                         {...register("description",{required:"Description is required"})}
+                                        placeholder="Describe why travelers should plan with us..."
                                     />
                                     {errors.description && <p className="text-red-500">{errors.description.message}</p>}
                                 </div>

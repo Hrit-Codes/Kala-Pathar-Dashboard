@@ -68,8 +68,6 @@ export default function IconPicker({ value, onChange, error }: IconPickerProps) 
                     </div>
                 )}
             </div>
-
-            {error && <p className="text-xs text-red-500">{error}</p>}
         </div>
     );
 }

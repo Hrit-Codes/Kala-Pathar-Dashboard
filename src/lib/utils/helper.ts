@@ -1,3 +1,5 @@
+import { AxiosError } from "axios";
+
 export const getEstimatedReadTime = (
   content: string,
   charsPerMinute: number = 1000 // Average reading speed in characters per minute
@@ -22,3 +24,14 @@ export const getEstimatedReadTime = (
   const roundedMinutes = Math.round(minutes);
   return `${roundedMinutes} minute${roundedMinutes > 1 ? "s" : ""}`;
 };
+
+export async function fetchOrNull<T>(fn: () => Promise<T>): Promise<T | null> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (error instanceof AxiosError && error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
+}

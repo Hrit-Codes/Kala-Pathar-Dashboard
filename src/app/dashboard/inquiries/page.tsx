@@ -4,11 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import PageHeader from "@/src/components/layout/PageHeader";
 import { INQUIRY_FILTER_TABS } from "@/src/lib/constants";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getInquiries, type IInquiry } from "@/src/lib/api/inquiries";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { IInquiryTabCount } from "@/src/lib/api/inquiries";
 import PageStatus from "@/src/components/ui/PageStatus";
 import Pagination from "@/src/components/ui/Pagination";
+import type { IInquiry, IInquiryTabCount } from "@/src/types/inquiry";
+import { getInquiries } from "@/src/lib/api/inquiries";
 
 export default function InquiryPage() {
   const router = useRouter();
