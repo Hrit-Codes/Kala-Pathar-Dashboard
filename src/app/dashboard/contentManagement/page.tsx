@@ -12,10 +12,10 @@ export default async function ContentManagementPage() {
     const partnerData= await getPartnerSection();
 
     return (
-        <ContentManagementClient 
-            initialWhyPlanWithUs={whyPlanWithUsData.data as IWhyPlanWithUsItem[]} 
-            initialAboutUs={aboutUsData.data as IAboutUs}
-            initialPartner={partnerData as IPartnerSection }
+        <ContentManagementClient
+            initialWhyPlanWithUs={whyPlanWithUsData.data as IWhyPlanWithUsItem[]}
+            initialAboutUs={(aboutUsData?.data ?? null) as IAboutUs | null}
+            initialPartner={partnerData as IPartnerSection | null}
         />
     );
 }

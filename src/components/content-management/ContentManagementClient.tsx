@@ -14,8 +14,8 @@ type ContentTab = "About_Us" | "Why_Plan_With_Us" | "Affiliations";
 
 type ContentManagementClientProps={
     initialWhyPlanWithUs:IWhyPlanWithUsItem[],
-    initialAboutUs:IAboutUs,
-    initialPartner:IPartnerSection;
+    initialAboutUs:IAboutUs | null,
+    initialPartner:IPartnerSection | null;
 }
 
 export default function ContentManagementClient({initialWhyPlanWithUs, initialAboutUs, initialPartner}:ContentManagementClientProps) {

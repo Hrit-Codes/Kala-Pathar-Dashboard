@@ -16,3 +16,9 @@ export interface WhyPlanWithUsFormValues {
     order?: number;
     isActive?: boolean;
 }
+
+export interface IWhyChooseUsResponse {
+    success: boolean;
+    message: string;
+    data: IWhyPlanWithUsItem[];
+}

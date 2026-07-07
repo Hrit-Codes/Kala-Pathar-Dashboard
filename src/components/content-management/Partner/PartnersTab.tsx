@@ -25,14 +25,13 @@ interface AffiliationItem {
 }
 
 
-export default function PartnersTab({initialData}:{initialData:IPartnerSection}) {
+export default function PartnersTab({initialData}:{initialData:IPartnerSection | null}) {
     const router= useRouter();
     const [isLoading, setIsLoading]=useState(!initialData);
-    console.log(initialData);
 
     //Section states
-    const [sectionTitle,   setSectionTitle]   = useState(initialData?.sectionTitle);
-    const [sectionTagline, setSectionTagline] = useState(initialData?.sectionTagline);
+    const [sectionTitle,   setSectionTitle]   = useState(initialData?.sectionTitle || "");
+    const [sectionTagline, setSectionTagline] = useState(initialData?.sectionTagline || "");
     const [badges,         setBadges]         = useState(initialData?.badges || []);
     const [newBadge,       setNewBadge]       = useState("");
     const [isSectionDirty, setIsSectionDirty] = useState(false);
@@ -55,8 +54,8 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
     // Sync data if initialData changes
     useEffect(()=>{
         if(initialData){
-            setSectionTitle(initialData.sectionTitle);
-            setSectionTagline(initialData.sectionTagline);
+            setSectionTitle(initialData.sectionTitle || "");
+            setSectionTagline(initialData.sectionTagline || "");
 
             setBadges(initialData.badges || []);
 
@@ -82,8 +81,8 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
 
     const sectionMutation= useMutation({
         mutationFn:()=>updatePartnerSection({
-            sectionTitle,
-            sectionTagline,
+            sectionTitle: sectionTitle || "",
+            sectionTagline: sectionTagline || "",
             badges
         }),
         onSuccess:()=>{
@@ -97,7 +96,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
     })
 
     // Affiliation mutations
-
     const updateAffiliationMutation = useMutation({
         mutationFn: ({ id, formData }: { id: string; formData: FormData }) =>
             updateAffiliation(id, formData),
@@ -225,6 +223,8 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
             <PageLoader/>
         )
     }
+
+    const hasInitialData=!!initialData;
 
     return (
         <div className="w-full flex flex-col gap-6 pb-24">
@@ -392,9 +392,15 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection})
                     <button
                         type="button"
                         onClick={() => {
-                            setSectionTitle(initialData.sectionTitle);
-                            setSectionTagline(initialData.sectionTagline);
-                            setBadges(initialData.badges);
+                            if(hasInitialData){
+                                setSectionTitle(initialData?.sectionTitle || "");
+                                setSectionTagline(initialData?.sectionTagline || "");
+                                setBadges(initialData?.badges || [])
+                            }else{
+                                setSectionTitle("");
+                                setSectionTagline("");
+                                setBadges([]);
+                            }
                             setIsSectionDirty(false);
                         }}
                         disabled={!isSectionDirty || sectionMutation.isPending}
