@@ -1,29 +1,100 @@
 "use client"
 
-import { ArrowLeft, FileText, Paperclip, SquarePen, Inbox } from "lucide-react";
+import { ArrowLeft, FileText, SquarePen, Inbox, X, Eye } from "lucide-react";
 import { TiptapEditor } from "@/src/components/forms/TipTap"
+import { getInquiryById, replyToInquiry } from "@/src/lib/api/inquiries";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { PageLoader } from "@/src/components/ui/PageLoader";
+import { useParams, useRouter } from "next/navigation";
+import { getEstimatedReadTime } from "@/src/lib/utils/helper";
+import { buildInquiryReplyPreview } from "@/src/lib/utils/emailTemplate";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import PageStatus from "@/src/components/ui/PageStatus";
+
+interface ReplyFormValues {
+  message: string;
+}
 
 export default function InquiryIdPage() {
-  return (
-    <div className="w-full min-h-screen flex flex-col gap-6">
+  const params=useParams();
+  const id =params?.id as string;
+  const router=useRouter();
+  const queryClient= useQueryClient();
 
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div className="flex flex-col gap-1">
-          <button className="flex items-center gap-2 text-xs font-bold text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer group">
+  const [showPreview, setShowPreview] = useState(false);
+
+  const { data: inquiryData, isLoading, isError } = useQuery({
+    queryKey: ["inquiry",id],
+    queryFn: () =>getInquiryById(id as string),
+    enabled:!!id,
+    placeholderData: keepPreviousData, 
+  });
+
+  const { handleSubmit, watch, reset, control, formState:{errors}}=useForm<ReplyFormValues>({
+    defaultValues:{message:""}
+  });
+
+  const replyMessage=watch("message")
+
+  useEffect(() => {
+    if (inquiryData?.isReplied && inquiryData.replyMessage) {
+      reset({ message: inquiryData.replyMessage });
+    }
+  }, [inquiryData, reset]);
+
+  const emailPreviewHtml = buildInquiryReplyPreview(
+    inquiryData?.fullname || "",
+    inquiryData?.subject || "",
+    replyMessage
+  );
+
+  const readTime= getEstimatedReadTime(replyMessage);
+
+  const replyMutation=useMutation({
+    mutationFn:(message:string)=>replyToInquiry(id, message),
+    onSuccess:()=>{
+      toast.success("Successfully replied to inquiry");
+      queryClient.invalidateQueries({queryKey:["inquiry",id]});
+      queryClient.invalidateQueries({queryKey:["inquiries"]})
+      router.back()
+    },
+    onError:(error:any)=>{
+      const message=error.response?.data?.message || "Server error";
+      toast.error(message);
+    }
+  })
+
+  const onSubmit=(values:ReplyFormValues)=>{
+    replyMutation.mutate(values.message);
+  }
+
+  if(isLoading){
+    return <PageLoader/>
+  }
+
+  if(isError){
+    return <PageStatus variant="not-found" page="This inquiry"/>
+  }
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="w-full min-h-screen flex flex-col gap-6">
+
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-6">
+        <div className="flex flex-col gap-4">
+          <button onClick={()=>router.back()} className="flex items-center gap-2 text-xs font-bold text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer group">
             <ArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
             <span>Back to Inquiries</span>
           </button>
           <h2 className="text-xl font-bold text-neutral-900 tracking-tight">Reply to Inquiry</h2>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="btn-secondary whitespace-nowrap">
-            Mark as Resolved
+        {!inquiryData?.isReplied&& (
+          <button type="submit" disabled={replyMutation.isPending} className="btn-primary whitespace-nowrap">
+            {replyMutation.isPending? "Sending...":"Send Reply"}
           </button>
-          <button className="btn-primary whitespace-nowrap">
-            Send Reply
-          </button>
-        </div>
+        )}
       </div>
 
       {/* Original Inquiry Details Card */}
@@ -33,8 +104,8 @@ export default function InquiryIdPage() {
             <Inbox size={18} className="text-neutral-500" />
             <h4 className="card-title">Original Inquiry Details</h4>
           </div>
-          <span className="badge-pending">
-            Pending Reply
+          <span className={inquiryData?.isReplied?"badge-success":"badge-pending"}>
+            {inquiryData?.isReplied?"Replied":"Pending"}
           </span>
         </div>
 
@@ -42,29 +113,29 @@ export default function InquiryIdPage() {
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Full Name</h5>
-              <span className="text-sm font-semibold text-neutral-800">Benjamin Thorne</span>
+              <span className="text-sm font-semibold text-neutral-800">{inquiryData?.fullname}</span>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Email Address</h5>
-              <span className="text-sm font-semibold text-neutral-800">b.thorne@expedition.travel.co.uk</span>
+              <span className="text-sm font-semibold text-neutral-800">{inquiryData?.email}</span>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Phone Number</h5>
-              <span className="text-sm font-semibold text-neutral-800">+44 20 7946 0123</span>
+              <span className="text-sm font-semibold text-neutral-800">{inquiryData?.phone}</span>
             </div>
 
             <div className="flex flex-col gap-1.5">
               <h5 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Subject</h5>
-              <span className="text-sm font-semibold text-neutral-800">Private Expedition Base Camp Expedition Inquiry</span>
+              <span className="text-sm font-semibold text-neutral-800">{inquiryData?.subject}</span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2 pt-2 border-t border-neutral-100">
             <h5 className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">Description</h5>
             <p className="bg-neutral-50 border border-neutral-200/50 p-4 rounded-xl text-sm text-neutral-700 leading-relaxed font-medium">
-              "Hello, I am interested in organizing a private expedition to Everest Base Camp for a group of 6 experienced hikers in mid-September. We are looking for a high-end experience including premium lodge stays and oxygen support for the higher altitudes. Could you provide a detailed itinerary and a cost estimate for a 14-day trip? We have previously completed the Annapurna Circuit and are looking for something more challenging but with Elite-level support."
+              "{inquiryData?.description}"
             </p>
           </div>
         </div>
@@ -83,49 +154,86 @@ export default function InquiryIdPage() {
             <FileText size={15} />
             <span>Use Template</span>
           </button>
-          <button className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer">
-            <Paperclip size={15} />
-            <span>Attach Documents</span>
+          <button
+            onClick={() => setShowPreview(true)}
+            className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-neutral-800 transition-colors cursor-pointer ml-auto"
+          >
+            <Eye size={15} />
+            <span>Preview Email</span>
           </button>
         </div>
 
         <div className="p-6 bg-white">
-          <TiptapEditor 
-            onChange={(html) => {
-              console.log(html);
+          <Controller
+            name="message"
+            control={control}
+            rules={{
+              validate: (value) =>
+                (value && value !== "<p></p>") || "A reply message is required",
             }}
-            initialContent={`
-              <p>Dear Mr. Thorne,</p>
-              <p>Thank you for contacting Himalayan Elite. It is a pleasure to hear from experienced hikers such as your group.</p>
-              <p>Regarding your inquiry for a private Everest Base Camp Expedition in mid-September, we would be delighted to arrange a premium 14-day itinerary tailored specifically to your group's requirements.</p>
-              <p>Our 'Elite Circuit' service includes:</p>
-              <ul>
-                <li>Private helicopter transfers between Kathmandu and Lukla.</li>
-                <li>Luxury lodge accommodations where available.</li>
-                <li>Personal Sherpa guides with extensive high-altitude experience.</li>
-                <li>Full medical support including O2 systems.</li>
-              </ul>
-            `}
+            render={({ field }) => (
+              <TiptapEditor
+                initialContent={field.value}
+                onChange={field.onChange}
+                error={!!errors.message}
+              />
+            )}
           />
+          {errors.message && (
+            <p className="text-xs font-semibold text-red-500 mt-2">
+              {errors.message.message}
+            </p>
+          )}
         </div>
 
         <div className="px-6 py-4 bg-neutral-50/50 border-t border-neutral-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <span className="text-xs font-bold text-neutral-500 tracking-wide">
-            Estimated read time: <span className="text-neutral-700">45 seconds</span>
+            Estimated read time: <span className="text-neutral-700">{readTime}</span>
           </span>
           
+          {!inquiryData?.isReplied && (
           <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button className="btn-secondary flex-1 sm:flex-initial whitespace-nowrap">
-              Save Draft
-            </button>
-            <button className="btn-primary flex-1 sm:flex-initial px-6 whitespace-nowrap">
-              Send Reply
+            <button type="submit" disabled={replyMutation.isPending} className="btn-primary flex-1 sm:flex-initial px-6 whitespace-nowrap">
+              {replyMutation.isPending?"Sending...":"Send reply"}
             </button>
           </div>
+          )}
         </div>
 
       </div>
 
-    </div>
+      {/* Email Preview Modal */}
+      {showPreview && (
+        <div
+          className="fixed inset-0 z-50 flex justify-center items-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowPreview(false)}
+        >
+          <div
+            className="card w-full max-w-2xl h-[600px] flex flex-col"  
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-100 flex-shrink-0">
+              <h4 className="font-bold text-neutral-900 text-sm">Email Preview</h4>
+              <button
+                onClick={() => setShowPreview(false)}
+                className="text-neutral-400 hover:text-neutral-700 cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            
+            <div className="flex-1 min-h-0">  
+              <iframe
+                srcDoc={emailPreviewHtml}
+                title="Email preview"
+                className="w-full h-full border-0"  
+                sandbox="allow-scripts"
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+    </form>
   );
 }

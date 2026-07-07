@@ -70,19 +70,16 @@ export const INQUIRY_FILTER_TABS=[
     {
         id:"all",
         label:"All Inquiries",
-        count:248,
         value:"All",
     },
     {
         id:"pending",
         label:"Pending",
-        count:12,
         value:"Pending"
     },
     {
         id:"replied",
         label:"Replied",
-        count:236,
         value:"Replied"
     }
 ]
