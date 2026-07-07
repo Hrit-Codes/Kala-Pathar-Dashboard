@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { api } from "./api";
 
 export interface ISocialLinks {
@@ -24,9 +25,16 @@ export interface ICompanyInfo {
     mapEmbedUrl?: string;
 }
 
-export const getCompanyInfo = async (): Promise<ICompanyInfo> => {
+export const getCompanyInfo = async (): Promise<ICompanyInfo|null> => {
+    try{
     const { data } = await api.get("/companyinfo/getInfo");
     return data.data;
+    }catch(error){
+        if(error instanceof AxiosError && error.response?.status===404){
+            return null;
+        }
+        throw error;
+    }
 };
 
 export const updateCompanyInfo = async (formData: FormData): Promise<ICompanyInfo> => {
@@ -35,3 +43,10 @@ export const updateCompanyInfo = async (formData: FormData): Promise<ICompanyInf
     });
     return data.data;
 };
+
+export const createCompanyInfo=async(formData:FormData):Promise<ICompanyInfo>=>{
+    const { data }= await api.post("/companyInfo/create",formData,{
+        headers:{"Content-Type":"multipart/form-data"},
+    });
+    return data.data;
+}
