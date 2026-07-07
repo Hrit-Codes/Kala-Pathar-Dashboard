@@ -129,8 +129,8 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                 </div>
                             )}
                             />
-                            <div>
-                                <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-row justify-between gap-5">
+                                <div className="flex flex-col gap-1.5 w-7/8">
                                     <label className="text-xs font-bold text-neutral-500 tracking-wide">Title</label>
                                     <input
                                         type="text"
@@ -141,7 +141,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                     />
                                     {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
                                 </div>
-                                <div className="flex flex-col gap-1.5">
+                                <div className="flex flex-col gap-1.5 w-1/8">
                                     <label className="text-xs font-bold text-neutral-500 tracking-wide">Order</label>
                                     <input
                                         type="number"
@@ -149,7 +149,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                         {...register("order",{required:"Order is required"})}
                                         disabled={isPending}
                                         placeholder="1"
-                                        className="input"
+                                        className="input text-center"
                                     />
                                     {errors.order && <p className="text-xs text-red-500">{errors.order.message}</p>}
                                 </div>
@@ -160,6 +160,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                         type="text"
                                         className="input"
                                         {...register("subtitle",{required:"Subtitle is required"})}
+                                        placeholder="e.g. A breathtaking view of the world's highest peak"
                                     />
                                     {errors.subtitle && <p className="text-xs text-red-500">{errors.subtitle.message}</p>}
                                 </div>
@@ -169,6 +170,7 @@ export default function GalleryForm({setIsFormOpen, item}:GalleryFormProps){
                                         rows={5}
                                         className="input leading-relaxed resize-none"
                                         {...register("description",{required:"Description is required"})}
+                                        placeholder="Describe the image and its significance to the gallery..."
                                     />
                                     {errors.description && <p className="text-red-500">{errors.description.message}</p>}
                                 </div>
