@@ -6,8 +6,7 @@ import {
   Mountain, 
   Map, 
   MessageSquare, 
-  Image as ImageIcon, 
-  Info, 
+  Image as ImageIcon,  
   Settings, 
   Building2,
   FileText
@@ -15,7 +14,7 @@ import {
 
 const menuItems = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Expeditions', href: '/dashboard/expeditions', icon: Mountain },
+  { name: 'Packages', href: '/dashboard/packages', icon: Mountain },
   { name: 'Destinations', href: '/dashboard/destinations', icon: Map },
   { name: 'Inquiries', href: '/dashboard/inquiries', icon: MessageSquare },
   { name: 'Gallery', href: '/dashboard/gallery', icon: ImageIcon },
