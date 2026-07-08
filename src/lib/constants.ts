@@ -1,4 +1,5 @@
 import { Mountain, MessageSquare, Map, Star } from "lucide-react";
+import type { IPackageType } from "./api/categories";
 
 export const DASHBOARD_STATS = [
   {
@@ -102,7 +103,8 @@ export const CONTENT_FILTER_TABS=[
   }
 ] 
 
-export const WHY_CHOOSE_US_ICONS = [
+export const ALL_ICONS = [
+    // From WHY_CHOOSE_US_ICONS
     { label: "Mountain", value: "mountain", component: "Mountain" },
     { label: "Shield", value: "shield", component: "Shield" },
     { label: "Globe", value: "globe", component: "Globe" },
@@ -113,4 +115,70 @@ export const WHY_CHOOSE_US_ICONS = [
     { label: "Heart", value: "heart", component: "Heart" },
     { label: "Compass", value: "compass", component: "Compass" },
     { label: "Map", value: "map", component: "Map" },
+    // From PACKAGE_TYPES_ICONS (unique ones)
+    { label: "Camera", value: "camera", component: "Camera" },
+    { label: "Coffee", value: "coffee", component: "Coffee" },
+    { label: "Sparkles", value: "sparkles", component: "Sparkles" },
+    { label: "Tent", value: "tent", component: "Tent" },
+    { label: "Tree", value: "tree", component: "Tree" },
+    { label: "Cloud", value: "cloud", component: "Cloud" },
 ] as const;
+
+
+export const CATEGORIES_AND_DESTINATIONS_TAB=[
+  {
+    id:"package_types",
+    label:"Package Types",
+    value:"Package_Types"
+  },
+  {
+    id:"destinations",
+    label:"Destinations",
+    value:"Destinations"
+  }
+]
+
+export const packageTypes: IPackageType[] = [
+    {
+        _id: "1",
+        name: "Trekking",
+        slug: "trekking",
+        icon: "mountain",
+        themeColor: "#009668",
+        description: "Multi-day mountain treks and hiking adventures across the Himalayas",
+        hasDifficultyLevels: false,
+        order: 1,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        __v: 0
+    },
+    {
+        _id: "2",
+        name: "Mountain Expedition",
+        slug: "mountain-expedition",
+        icon: "compass",
+        themeColor: "#EA580C",
+        description: "High-altitude climbing expeditions and peak ascents",
+        hasDifficultyLevels: false,
+        order: 2,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        __v: 0
+    },
+    {
+        _id: "3",
+        name: "Cultural Tour",
+        slug: "cultural-tour",
+        icon: "landmark",
+        themeColor: "#1D4ED8",
+        description: "Immersive cultural heritage and historical experiences",
+        hasDifficultyLevels: false,
+        order: 3,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        __v: 0
+    }
+];
