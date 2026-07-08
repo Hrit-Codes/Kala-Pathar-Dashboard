@@ -9,6 +9,15 @@ export const getPartnerSection = async (): Promise<IPartnerSection | null> => {
     });
 };
 
+export const createPartnerSection = async (payload: {
+    sectionTitle?: string;
+    sectionTagline?: string;
+    badges?: string[];
+}) => {
+    const { data } = await api.post("/partner/create", payload);
+    return data;
+};
+
 export const updatePartnerSection = async (payload: {
     sectionTitle?: string;
     sectionTagline?: string;
