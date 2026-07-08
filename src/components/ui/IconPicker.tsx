@@ -3,8 +3,8 @@
 
 import * as LucideIcons from "lucide-react";
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { WHY_CHOOSE_US_ICONS } from "@/src/lib/constants";
+import { ChevronDown } from "lucide-react";import { ALL_ICONS } from "@/src/lib/constants";
+;
 
 interface IconPickerProps {
     value: string;
@@ -40,7 +40,7 @@ export default function IconPicker({ value, onChange, error }: IconPickerProps) 
 
                 {isOpen && (
                     <div className="absolute z-20 top-full mt-1 w-full bg-white border border-neutral-200 rounded-xl shadow-lg p-2 grid grid-cols-5 gap-1 max-h-48 overflow-y-auto">
-                        {WHY_CHOOSE_US_ICONS.map((icon) => {
+                        {ALL_ICONS.map((icon) => {
                             const Icon = (LucideIcons as any)[icon.component];
                             const isSelected = value === icon.value;
                             return (

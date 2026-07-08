@@ -1,3 +1,12 @@
+export interface IPagination{
+    total:number,
+    page:number,
+    limit:number,
+    totalPage:number,
+    hasNextPage:boolean,
+    hasPrevPage:boolean
+}
+
 export interface IInquiry {
     _id: string;
     fullname: string;
@@ -22,14 +31,7 @@ export interface IInquiryResponse{
     success:boolean,
     message:string,
     data:IInquiry[],
-    pagination:{
-        total:number,
-        page:number,
-        limit:number,
-        totalPage:number,
-        hasNextPage:boolean,
-        hasPrevPage:boolean
-    }
+    pagination:IPagination,
     tabCounts:IInquiryTabCount
 
 }
