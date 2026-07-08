@@ -81,6 +81,7 @@ export default function PartnerForm({
                         <button
                             type="button"
                             onClick={() => localFileInputRef.current?.click()}
+                            disabled={isSaving}
                             className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
                         >
                             <Upload size={14} className="text-white" />
@@ -90,6 +91,7 @@ export default function PartnerForm({
                             type="file"
                             accept="image/*"
                             className="hidden"
+                            disabled={isSaving}
                             onChange={handleFileChange}
                         />
                     </>
@@ -107,6 +109,7 @@ export default function PartnerForm({
                                 onDraftChange((prev) => ({ ...prev, abbreviation: e.target.value }))
                             }
                             placeholder="Abbreviation"
+                            disabled={isSaving}
                             className="input py-1.5 text-sm font-bold"
                         />
                         <input
@@ -116,6 +119,7 @@ export default function PartnerForm({
                                 onDraftChange((prev) => ({ ...prev, name: e.target.value }))
                             }
                             placeholder="Full name"
+                            disabled={isSaving}
                             className="input py-1.5 text-xs"
                         />
                         <input
@@ -125,6 +129,7 @@ export default function PartnerForm({
                                 onDraftChange((prev) => ({ ...prev, order: Number(e.target.value) }))
                             }
                             placeholder="Order"
+                            disabled={isSaving}
                             className="input py-1.5 text-xs w-24"
                             min={1}
                         />
@@ -160,6 +165,7 @@ export default function PartnerForm({
                         <button
                             type="button"
                             onClick={onCancelEdit}
+                            disabled={isSaving}
                             className="h-8 w-8 rounded-lg border border-neutral-200 flex items-center justify-center text-neutral-500 hover:text-red-500 hover:border-red-200 transition-colors"
                             title="Cancel"
                         >

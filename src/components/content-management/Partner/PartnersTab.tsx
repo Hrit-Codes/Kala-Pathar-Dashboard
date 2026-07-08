@@ -6,7 +6,7 @@ import PartnerForm from "./AffiliationForm";
 import type { IPartnerSection } from "@/src/types/partner";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
-import { addAffiliation, deleteAffiliation, updateAffiliation, updatePartnerSection } from "@/src/lib/api/partner";
+import { addAffiliation, createPartnerSection, deleteAffiliation, updateAffiliation, updatePartnerSection } from "@/src/lib/api/partner";
 import { toast } from "sonner";
 
 const MIN_AFFILIATIONS = 3;
@@ -22,7 +22,6 @@ interface AffiliationItem {
     order: number;
     _newLogo?: File | null;
 }
-
 
 export default function PartnersTab({initialData}:{initialData:IPartnerSection | null}) {
     const router= useRouter();
@@ -54,7 +53,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
         if(initialData){
             setSectionTitle(initialData.sectionTitle || "");
             setSectionTagline(initialData.sectionTagline || "");
-
             setBadges(initialData.badges || []);
 
             if(initialData.affiliations){
@@ -76,7 +74,23 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
 
     //Section Mutation
 
-    const sectionMutation= useMutation({
+    const sectionCreateMutation= useMutation({
+        mutationFn:()=>createPartnerSection({
+            sectionTitle: sectionTitle || "",
+            sectionTagline: sectionTagline || "",
+            badges
+        }),
+        onSuccess:()=>{
+            toast.success("Section added successfully");
+            setIsSectionDirty(false);
+            router.refresh();
+        },
+        onError:(error:any)=>{
+            toast.error(error.response?.data?.message || "Failed to add section");
+        }
+    })
+
+    const sectionUpdateMutation= useMutation({
         mutationFn:()=>updatePartnerSection({
             sectionTitle: sectionTitle || "",
             sectionTagline: sectionTagline || "",
@@ -132,7 +146,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
     });
 
     // Affiliation Handlers
-    
     const handleStartEdit = (item: AffiliationItem) => {
         setEditingId(item._id);
         setEditDraft({ ...item });
@@ -143,6 +156,8 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
         setEditingId(null);
         setEditDraft({});
         setLogoPreview("");
+        // Remove temp item if it exists
+        setAffiliations(prev => prev.filter(a => !a._id.startsWith("temp-")));
     };
 
     const handleConfirmEdit = (id: string) => {
@@ -189,7 +204,6 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
         setEditingId(tempId);
         setEditDraft(newPartner);
         setLogoPreview("");
-
     }
 
     const handleDelete = (id: string) => {
@@ -197,8 +211,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
         deleteAffiliationMutation.mutate(id);
     };
 
-    // ── Badge Handlers ───────────────────────────────────────────────────────
-
+    // Badge Handlers
     const handleAddBadge = () => {
         const trimmed = newBadge.trim();
         if (!trimmed || !canAddBadge) return;
@@ -213,10 +226,8 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
         setIsSectionDirty(true);
     };
 
-    const isPending=updateAffiliationMutation.isPending || addAffiliationMutation.isPending || deleteAffiliationMutation.isPending;
-
-
-    const hasInitialData=!!initialData;
+    const isPending = updateAffiliationMutation.isPending || addAffiliationMutation.isPending || deleteAffiliationMutation.isPending;
+    const hasInitialData = !!initialData;
 
     return (
         <div className="w-full flex flex-col gap-6 pb-24">
@@ -234,6 +245,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                             type="text"
                             value={sectionTitle}
                             onChange={(e) => { setSectionTitle(e.target.value); setIsSectionDirty(true); }}
+                            placeholder="e.g. Trusted Partners & Affiliations"
                             className="input"
                         />
                     </div>
@@ -243,6 +255,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                             type="text"
                             value={sectionTagline}
                             onChange={(e) => { setSectionTagline(e.target.value); setIsSectionDirty(true); }}
+                            placeholder="e.g. Proudly associated with industry leaders"
                             className="input"
                         />
                     </div>
@@ -251,26 +264,28 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
 
             {/* ── Affiliations Manager ───────────────────────────────────────── */}
             <div className="card p-6 flex flex-col gap-5">
-                <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
-                    <div className="flex items-center gap-2.5">
-                        <ShieldCheck size={18} className="text-primary-700" />
-                        <h4 className="card-title">Affiliations Manager</h4>
-                        <span className="badge bg-primary-50 text-primary-700 border border-primary-100 normal-case font-bold text-[11px]">
-                            {affiliations.length} / {MAX_AFFILIATIONS} Items
-                        </span>
+                <div className="flex flex-col border-b border-neutral-100 pb-4">
+                    <div className="flex items-center justify-between pb-4">
+                        <div className="flex items-center gap-2.5">
+                            <ShieldCheck size={18} className="text-primary-700" />
+                            <h4 className="card-title">Affiliations Manager</h4>
+                            <span className="badge bg-primary-50 text-primary-700 border border-primary-100 normal-case font-bold text-[11px]">
+                                {affiliations.length} / {MAX_AFFILIATIONS} Items
+                            </span>
+                        </div>
+                        {canAddAffiliation && (
+                            <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={handleAddAffiliation}
+                                className="btn-primary flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                                <Plus size={14} />
+                                Add Partner
+                            </button>
+                        )}
                     </div>
-                    {canAddAffiliation && (
-                        <button
-                            type="button"
-                            disabled={isPending}
-                            onClick={handleAddAffiliation}
-                            className="btn-primary flex items-center gap-1.5 disabled:opacity-50"
-                            // wire to your add affiliation modal/form here
-                        >
-                            <Plus size={14} />
-                            Add Partner
-                        </button>
-                    )}
+                    <span className="text-xs text-neutral-500">(First ensure that the Section Branding and Badges are updated before adding affiliations)</span>
                 </div>
 
                 {!canDeleteAffiliation && (
@@ -316,6 +331,9 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                 <div className="flex items-center gap-2.5 border-b border-neutral-100 pb-4">
                     <Tag size={18} className="text-primary-700" />
                     <h4 className="card-title">Trust Badges Manager</h4>
+                    <span className="badge bg-primary-50 text-primary-700 border border-primary-100 normal-case font-bold text-[11px]">
+                        {badges.length} / {MAX_BADGES} Items
+                    </span>
                 </div>
 
                 <div className="flex flex-wrap gap-2 min-h-[48px] p-3 rounded-xl border border-neutral-200 bg-neutral-50/30">
@@ -355,7 +373,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                             value={newBadge}
                             onChange={(e) => setNewBadge(e.target.value)}
                             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleAddBadge(); }}}
-                            placeholder="Enter new badge title..."
+                            placeholder="e.g. 10 Years of Excellence"
                             className="input flex-1"
                         />
                         <button
@@ -364,7 +382,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                             disabled={!newBadge.trim()}
                             className="btn-primary disabled:opacity-50"
                         >
-                            Add
+                            Add Badge
                         </button>
                     </div>
                 ) : (
@@ -374,7 +392,7 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                 )}
             </div>
 
-            {/* ── Sticky Footer — section branding only ─────────────────────── */}
+            {/* ── Sticky Footer ─────────────────────────────────────────────── */}
             <div className="fixed bottom-0 left-0 right-0 z-10 bg-white border-t border-neutral-200 px-6 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-neutral-400 font-medium">
                     <Clock size={13} />
@@ -395,22 +413,23 @@ export default function PartnersTab({initialData}:{initialData:IPartnerSection |
                             }
                             setIsSectionDirty(false);
                         }}
-                        disabled={!isSectionDirty || sectionMutation.isPending}
+                        disabled={!isSectionDirty || sectionUpdateMutation.isPending}
                         className="btn-secondary disabled:opacity-40"
                     >
                         Discard Changes
                     </button>
                     <button
                         type="button"
-                        onClick={() => sectionMutation.mutate()}
-                        disabled={!isSectionDirty || sectionMutation.isPending}
+                        onClick={() => initialData ? sectionUpdateMutation.mutate() : sectionCreateMutation.mutate()}
+                        disabled={!isSectionDirty || sectionUpdateMutation.isPending || sectionCreateMutation.isPending}
                         className="btn-primary disabled:opacity-40"
                     >
-                        {sectionMutation.isPending ? "Saving..." : "Update Section"}
+                        {initialData 
+                            ? sectionUpdateMutation.isPending ? "Saving..." : "Update Section"
+                            : sectionCreateMutation.isPending ? "Adding..." : "Add Section"}
                     </button>
                 </div>
             </div>
         </div>
-
     );
 }
