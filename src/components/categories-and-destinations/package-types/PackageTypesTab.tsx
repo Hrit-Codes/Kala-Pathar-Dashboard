@@ -1,6 +1,6 @@
 "use client";
 
-import type { IPackageTypesResponse } from "@/src/lib/api/categories";
+import type { IPackageTypesResponse } from "@/src/lib/api/package-types";
 import {packageTypes } from "@/src/lib/constants";
 import { Pencil, Plus, GripVertical, Mountain, Compass, Map, Camera, Coffee, Heart, Star, Globe, Sparkles } from "lucide-react";
 import { useState } from "react";
