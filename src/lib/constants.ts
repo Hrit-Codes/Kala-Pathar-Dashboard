@@ -1,5 +1,5 @@
 import { Mountain, MessageSquare, Map, Star } from "lucide-react";
-import type { IPackageType } from "./api/categories";
+import type { IPackageType } from "./api/package-types";
 
 export const DASHBOARD_STATS = [
   {

@@ -2,18 +2,21 @@
 
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { CATEGORIES_AND_DESTINATIONS_TAB } from "@/src/lib/constants";
-import type { IPackageTypesResponse } from "@/src/lib/api/categories";
+import type { IPackageTypesResponse } from "@/src/lib/api/package-types";
 import PackageTypesTab from "./package-types/PackageTypesTab";
+import type { IDestinationsResponse } from "@/src/lib/api/destinations";
+import DestinationsTab from "./destinations/DestinationsTab";
 
 
 type ContentTab = "Package_Types" | "Destinations";
 
 type CategoriesAndDestinationsManagementClientProps = {
     initialPackageTypes: IPackageTypesResponse,
+    initialDestinations: IDestinationsResponse
 }
 
 export default function CategoriesAndDestinationsManagementClient({ 
-    initialPackageTypes 
+    initialPackageTypes, initialDestinations 
 }: CategoriesAndDestinationsManagementClientProps) {
     const [activeTab, setActiveTab] = useState<ContentTab>("Package_Types");
     const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
@@ -94,12 +97,7 @@ export default function CategoriesAndDestinationsManagementClient({
             {/* Render tabs */}
             <div className="card">
                 {activeTab === "Package_Types" && <PackageTypesTab initialData={initialPackageTypes} />}
-                {activeTab === "Destinations" && (
-                    <div className="p-6">
-                        <h3>Destinations</h3>
-                        <p className="text-neutral-500">Coming soon...</p>
-                    </div>
-                )}
+                {activeTab === "Destinations" && <DestinationsTab initialData={initialDestinations}/>}
             </div>
         </div>
     );
