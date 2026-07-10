@@ -8,13 +8,13 @@ import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-interface DestinationFormProps {
+type DestinationFormProps ={
     handleUpdate: () => void;
 }
 
 export default function DestinationForm({ handleUpdate }: DestinationFormProps) {
 
-    const { register, handleSubmit, reset, formState:{errors, isSubmitting, isValid}, watch, setValue}=useForm<DestinationFormValues>({
+    const { register, handleSubmit, reset, formState:{errors, isValid}, watch, setValue}=useForm<DestinationFormValues>({
         resolver:zodResolver(destinationSchema),
         defaultValues:{
             name:"",

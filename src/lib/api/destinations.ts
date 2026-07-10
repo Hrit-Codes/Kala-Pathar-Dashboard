@@ -47,17 +47,3 @@ export const createDestination = async (body:DestinationFormValues): Promise<IDe
         const { data } = await api.post(`/destination/create`,body);
         return data;
 };
-
-// export const updateAboutUs = async (formData: FormData): Promise<IAboutUsResponse> => {
-//     const { data } = await api.put(`/aboutus/update/`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//     });
-//     return data;
-// };
-
-// export const createAboutUs = async (formData: FormData): Promise<IAboutUsResponse> => {
-//     const { data } = await api.post(`/aboutus/create`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//     });
-//     return data;
-// };

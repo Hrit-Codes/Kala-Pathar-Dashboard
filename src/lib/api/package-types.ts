@@ -1,6 +1,7 @@
 import { api } from "./api";
 import { fetchOrNull } from "../utils/helper";
 import type { IPagination } from "@/src/types/inquiry";
+import type { PackageTypeFormValues } from "../vallidators/package-type.validate";
 
 export interface IPackageType {
     _id: string;
@@ -28,21 +29,22 @@ export interface IPackageTypesResponse {
 
 export const getPackageTypes = async (): Promise<IPackageTypesResponse | null> => {
     return fetchOrNull(async () => {
-        const { data } = await api.get("/packageType/getPackageTypes?page=1&limit=4");
+        const { data } = await api.get("/packageType/getPackageTypes");
         return data;
     });
 };
 
-// export const updateAboutUs = async (formData: FormData): Promise<IAboutUsResponse> => {
-//     const { data } = await api.put(`/aboutus/update/`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//     });
-//     return data;
-// };
+export const delPackageType = async (id:string): Promise<IPackageTypesResponse | null> => {
+        const { data } = await api.delete(`/packageType/delete/${id}`);
+        return data;
+};
 
-// export const createAboutUs = async (formData: FormData): Promise<IAboutUsResponse> => {
-//     const { data } = await api.post(`/aboutus/create`, formData, {
-//         headers: { "Content-Type": "multipart/form-data" },
-//     });
-//     return data;
-// };
+export const updatePackageType = async (id:string,body:PackageTypeFormValues): Promise<IPackageTypesResponse | null> => {
+        const { data } = await api.put(`/packageType/updatePackageType/${id}`,body);
+        return data;
+};
+
+export const createPackageType = async (body:PackageTypeFormValues): Promise<IPackageTypesResponse | null> => {
+        const { data } = await api.post(`/packageType/create`,body);
+        return data;
+};
