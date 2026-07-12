@@ -1,7 +1,7 @@
 "use client"
 
 import { ArrowLeft, FileText, SquarePen, Inbox, X, Eye } from "lucide-react";
-import { TiptapEditor } from "@/src/components/forms/TipTap"
+import { TiptapEditor } from "@/src/components/ui/TipTap"
 import { getInquiryById, replyToInquiry } from "@/src/lib/api/inquiries";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageLoader } from "@/src/components/ui/PageLoader";
