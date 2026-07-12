@@ -38,7 +38,7 @@ export default function DestinationsTab({ initialData }: IDestinationProps) {
 
     return (
         <div className="w-full flex flex-col gap-6">
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start p-6">
+            <div className="grid grid-cols-1 xl:grid-cols-14 gap-6 items-start p-6">
 
                 {/* ── Left: List ──────────────────────────────────────────── */}
                 <div className="xl:col-span-8 flex flex-col gap-4">
@@ -85,7 +85,7 @@ export default function DestinationsTab({ initialData }: IDestinationProps) {
                 </div>
 
                 {/* ── Right: Quick Add Form ───────────────────────────────── */}
-                <div className="xl:col-span-4">
+                <div className="xl:col-span-6">
                     <DestinationForm handleUpdate={handleUpdate}/>
                 </div>
             </div>
