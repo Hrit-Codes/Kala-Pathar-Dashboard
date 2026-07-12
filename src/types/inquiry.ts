@@ -2,7 +2,7 @@ export interface IPagination{
     total:number,
     page:number,
     limit:number,
-    totalPage:number,
+    totalPages:number,
     hasNextPage:boolean,
     hasPrevPage:boolean
 }

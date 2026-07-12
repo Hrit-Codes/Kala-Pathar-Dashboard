@@ -1,188 +1,161 @@
 "use client";
-
-import { useRef, useState, useCallback } from "react";
-import { Camera, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Plus, X, Trash2, Image as ImageIcon } from "lucide-react";
+import Image from "next/image";
 
 export interface GalleryImageItem {
     id: string;
-    file?: File;   // present for newly-added, not-yet-uploaded images
-    url?: string;  // present for already-persisted images
+    url?: string;
+    file?: File | null;
+    isExisting?: boolean;
+    name?: string;
 }
 
 interface GalleryUploaderProps {
+    label: string;
     value: GalleryImageItem[];
-    onChange: (items: GalleryImageItem[]) => void;
+    onChange: (images: GalleryImageItem[]) => void;
     maxImages?: number;
-    accept?: string;
-    maxSizeMB?: number;
-    label?: string;
-    helperText?: string;
-}
-
-function getPreviewUrl(item: GalleryImageItem): string {
-    return item.file ? URL.createObjectURL(item.file) : item.url || "";
+    className?: string;
 }
 
 export default function GalleryUploader({
+    label,
     value,
     onChange,
     maxImages = 10,
-    accept = "image/jpeg,image/png,image/webp",
-    maxSizeMB = 5,
-    label = "Gallery Photos",
-    helperText,
+    className = "",
 }: GalleryUploaderProps) {
-    const inputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
-    const remainingSlots = maxImages - value.length;
-    const canAddMore = remainingSlots > 0;
+    const handleFileSelect = (files: FileList | null) => {
+        if (!files) return;
 
-    const validate = (file: File): string | null => {
-        const allowedTypes = accept.split(",").map((t) => t.trim());
-        if (!allowedTypes.includes(file.type)) {
-            return `Only ${allowedTypes.map((t) => t.split("/")[1].toUpperCase()).join(", ")} files are allowed`;
+        const newFiles = Array.from(files);
+        const remainingSlots = maxImages - value.length;
+
+        if (newFiles.length > remainingSlots) {
+            alert(`You can only upload ${remainingSlots} more images`);
+            return;
         }
-        if (file.size > maxSizeMB * 1024 * 1024) {
-            return `Each file must be under ${maxSizeMB}MB`;
-        }
-        return null;
+
+        const newImages: GalleryImageItem[] = newFiles.map((file) => ({
+            id: `new-${Date.now()}-${Math.random()}`,
+            file,
+            name: file.name,
+            isExisting: false,
+        }));
+
+        onChange([...value, ...newImages]);
     };
 
-    const addFiles = useCallback(
-        (fileList: FileList | File[]) => {
-            const files = Array.from(fileList);
-            if (files.length === 0) return;
+    const removeImage = (id: string) => {
+        onChange(value.filter((img) => img.id !== id));
+    };
 
-            if (!canAddMore) {
-                setError(`Maximum of ${maxImages} images allowed`);
-                return;
-            }
-
-            const accepted: GalleryImageItem[] = [];
-            let firstError: string | null = null;
-
-            for (const file of files) {
-                if (accepted.length >= remainingSlots) break;
-                const validationError = validate(file);
-                if (validationError && !firstError) {
-                    firstError = validationError;
-                    continue;
-                }
-                if (!validationError) {
-                    accepted.push({
-                        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-                        file,
-                    });
-                }
-            }
-
-            if (files.length > remainingSlots) {
-                firstError = `Only ${remainingSlots} more image${remainingSlots === 1 ? "" : "s"} can be added (max ${maxImages})`;
-            }
-
-            setError(firstError);
-            if (accepted.length > 0) {
-                onChange([...value, ...accepted]);
-            }
-        },
-        [value, onChange, canAddMore, remainingSlots, maxImages, accept, maxSizeMB]
-    );
-
-    const handleDrop = useCallback(
-        (e: React.DragEvent<HTMLDivElement>) => {
-            e.preventDefault();
-            setIsDragging(false);
-            if (e.dataTransfer.files?.length) addFiles(e.dataTransfer.files);
-        },
-        [addFiles]
-    );
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
-        if (canAddMore) setIsDragging(true);
+        setIsDragging(false);
+        handleFileSelect(e.dataTransfer.files);
     };
 
-    const handleDragLeave = () => setIsDragging(false);
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files?.length) addFiles(e.target.files);
-        e.target.value = "";
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(true);
     };
 
-    const handleRemove = (id: string) => {
-        onChange(value.filter((item) => item.id !== id));
-        setError(null);
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
     };
 
     return (
-        <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-bold text-neutral-500 tracking-wide">{label}</label>
+        <div className={`flex flex-col gap-3 ${className}`}>
+            <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-neutral-500 tracking-wide">
+                    {label}
+                </label>
+                <span className="text-xs text-neutral-400">
+                    {value.length} / {maxImages}
+                </span>
+            </div>
 
-            <div className="grid grid-cols-3 gap-2">
-                {/* Add tile */}
-                {canAddMore && (
+            {/* Gallery Grid */}
+            <div className="grid grid-cols-3 gap-3">
+                {value.map((image) => (
                     <div
-                        onClick={() => inputRef.current?.click()}
+                        key={image.id}
+                        className="relative aspect-square rounded-lg border border-neutral-200 overflow-hidden group bg-neutral-50"
+                    >
+                        {image.isExisting && image.url ? (
+                            // ✅ Show existing image from URL
+                            <img
+                                src={image.url}
+                                alt={image.name || "Gallery image"}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : image.file ? (
+                            // ✅ Show new image from file
+                            <img
+                                src={URL.createObjectURL(image.file)}
+                                alt={image.name || "Gallery image"}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-neutral-300">
+                                <ImageIcon size={24} />
+                            </div>
+                        )}
+                        <button
+                            type="button"
+                            onClick={() => removeImage(image.id)}
+                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                        {image.isExisting && (
+                            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-blue-500 text-white text-[8px] rounded">
+                                Existing
+                            </span>
+                        )}
+                    </div>
+                ))}
+
+                {/* Upload Button */}
+                {value.length < maxImages && (
+                    <div
+                        className={`aspect-square rounded-lg border-2 border-dashed border-neutral-300 flex flex-col items-center justify-center cursor-pointer hover:border-primary-400 hover:bg-primary-50/50 transition-colors ${
+                            isDragging ? "border-primary-500 bg-primary-50" : ""
+                        }`}
+                        onClick={() => fileInputRef.current?.click()}
                         onDrop={handleDrop}
                         onDragOver={handleDragOver}
                         onDragLeave={handleDragLeave}
-                        className={`aspect-square rounded-xl border-2 border-dashed flex items-center justify-center cursor-pointer transition-all
-                            ${isDragging
-                                ? "border-primary-500 bg-primary-50/50 scale-[1.02]"
-                                : "border-neutral-200 bg-neutral-50/50 hover:border-neutral-300 hover:bg-neutral-100/50"
-                            }
-                        `}
                     >
-                        <Camera
-                            size={22}
-                            className={isDragging ? "text-primary-500" : "text-neutral-400"}
-                        />
+                        <Plus size={24} className="text-neutral-400" />
+                        <span className="text-xs text-neutral-400 mt-1">Add Image</span>
                     </div>
                 )}
-
-                {/* Image thumbnails */}
-                {value.map((item) => (
-                    <div
-                        key={item.id}
-                        className="relative aspect-square rounded-xl overflow-hidden border border-neutral-200 group"
-                    >
-                        <img
-                            src={getPreviewUrl(item)}
-                            alt="Gallery item"
-                            className="w-full h-full object-cover"
-                        />
-                        <button
-                            type="button"
-                            onClick={() => handleRemove(item.id)}
-                            className="absolute top-1.5 right-1.5 h-6 w-6 rounded-full bg-black/60 hover:bg-red-500 text-white flex items-center justify-center transition-colors cursor-pointer"
-                        >
-                            <X size={13} />
-                        </button>
-                    </div>
-                ))}
             </div>
 
             <input
-                ref={inputRef}
+                ref={fileInputRef}
                 type="file"
-                accept={accept}
+                accept="image/*"
                 multiple
                 className="hidden"
-                onChange={handleInputChange}
+                onChange={(e) => {
+                    handleFileSelect(e.target.files);
+                    e.target.value = "";
+                }}
             />
 
-            {error && (
-                <p className="text-xs text-red-500 font-medium flex items-center gap-1">
-                    <X size={12} />
-                    {error}
+            {value.length === 0 && (
+                <p className="text-xs text-neutral-400 text-center">
+                    No images added yet. Click the + button to upload.
                 </p>
             )}
-
-            <p className="flex items-center gap-1.5 text-xs text-neutral-400 font-medium mt-0.5">
-                {helperText || `Select up to ${maxImages} high-resolution images.`}
-            </p>
         </div>
     );
 }

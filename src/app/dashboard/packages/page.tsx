@@ -1,134 +1,68 @@
 "use client"
 import PageHeader from "@/src/components/layout/PageHeader";
 import Pagination from "@/src/components/ui/Pagination";
-import { ChevronDown, Search, SlidersHorizontal, Edit, Trash2 } from "lucide-react";
+import { Search, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getPackages, type IDIFFICULTIES } from "@/src/lib/api/package";
+import { useQuery } from "@tanstack/react-query";
+import { getDestinations } from "@/src/lib/api/destinations";
+import type { PackagesFilterValues } from "@/src/components/package/PackagesFilter";
+import PackagesFilter from "@/src/components/package/PackagesFilter";
+import { PageLoader } from "@/src/components/ui/PageLoader";
 
-const DESTINATIONS = ["All Regions", "Everest", "Annapurna", "Manaslu", "Langtang", "Mustang"];
-const DIFFICULTIES = ["All Levels", "Easy", "Moderate", "Hard", "Extreme"];
-const FEATURED_OPTIONS = ["All Status", "Featured", "Not Featured"];
-
-const mockPackages = [
-    {
-        _id: "1",
-        title: "Everest Base Camp Luxury Trek",
-        slug: "everest-base-camp-trek",
-        badge: "Best Seller",
-        thumbnail: "",
-        price: 2450,
-        currency: "USD",
-        priceLabel: "per person",
-        durationDays: 14,
-        difficulty: "Hard",
-        isFeatured: true,
-        isActive: true,
-        views: 2840,
-        destination: "Solu-Khumbu, Nepal",
-        groupSize: 12,
-    },
-    {
-        _id: "2",
-        title: "Annapurna Circuit Ultimate",
-        slug: "annapurna-circuit",
-        badge: "Popular",
-        thumbnail: "",
-        price: 1890,
-        currency: "USD",
-        priceLabel: "per person",
-        durationDays: 18,
-        difficulty: "Moderate",
-        isFeatured: true,
-        isActive: true,
-        views: 1920,
-        destination: "Annapurna Region",
-        groupSize: 10,
-    },
-    {
-        _id: "3",
-        title: "Manaslu Circuit Off-Path",
-        slug: "manaslu-circuit",
-        badge: null,
-        thumbnail: "",
-        price: 2100,
-        currency: "USD",
-        priceLabel: "per person",
-        durationDays: 16,
-        difficulty: "Hard",
-        isFeatured: false,
-        isActive: true,
-        views: 980,
-        destination: "Manaslu Region",
-        groupSize: 8,
-    },
-    {
-        _id: "4",
-        title: "Langtang Valley Trek",
-        slug: "langtang-valley",
-        badge: "New",
-        thumbnail: "",
-        price: 850,
-        currency: "USD",
-        priceLabel: "per person",
-        durationDays: 10,
-        difficulty: "Easy",
-        isFeatured: false,
-        isActive: false,
-        views: 540,
-        destination: "Langtang Region",
-        groupSize: 15,
-    },
-];
-
-export default function PackagesPage() {
+export default function PackagesTab() {
     const router=useRouter();
-    const [search, setSearch] = useState("");
-    const [destination, setDestination] = useState("All Regions");
-    const [difficulty, setDifficulty] = useState("All Levels");
-    const [featured, setFeatured] = useState("All Status");
-    const [showAdvanced, setShowAdvanced] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [page,setPage]=useState<number>(1);
+    const [filters, setFilters]=useState<PackagesFilterValues>({
+        search:"",
+        destination:"",
+        difficulty:"",
+        isFeatured:"All Status",
+        minPrice:undefined,
+        maxPrice:undefined,
+        minDays:undefined,
+        maxDays:undefined
+    })
 
-    const filtered = mockPackages.filter((pkg) => {
-        const matchSearch =
-            !search ||
-            pkg.title.toLowerCase().includes(search.toLowerCase()) ||
-            pkg.destination.toLowerCase().includes(search.toLowerCase());
-        const matchDest = destination === "All Regions" || pkg.destination.includes(destination);
-        const matchDiff = difficulty === "All Levels" || pkg.difficulty === difficulty;
-        const matchFeat =
-            featured === "All Status" ||
-            (featured === "Featured" && pkg.isFeatured) ||
-            (featured === "Not Featured" && !pkg.isFeatured);
-        return matchSearch && matchDest && matchDiff && matchFeat;
-    });
+    const {data:destinations, isLoading:destinationLoading,isError:destinationError}=useQuery({
+        queryKey:["destination"],
+        queryFn:()=>getDestinations(),
+        staleTime:30*60*1000,
+        refetchOnMount:false
+    })
 
-    // Pagination
-    const limit = 10;
-    const totalPages = Math.ceil(filtered.length / limit);
-    const start = (currentPage - 1) * limit;
-    const paginatedData = filtered.slice(start, start + limit);
+    const {data, isLoading, isError,refetch}=useQuery({
+        queryKey:["packages",page,filters],
+        queryFn:()=>getPackages({
+            page,
+            limit:10,
+            search:filters.search || undefined,
+            destination:filters.destination || undefined,
+            // ✅ Fix: Cast to IDIFFICULTIES or undefined
+            difficulty: filters.difficulty === "All Levels" || !filters.difficulty 
+                ? undefined 
+                : filters.difficulty as IDIFFICULTIES,
+            isFeatured: filters.isFeatured === "All Status" 
+                ? undefined 
+                : filters.isFeatured === "Featured",
+            minPrice:filters.minPrice,
+            maxPrice:filters.maxPrice,
+            minDays:filters.minDays,
+            maxDays:filters.maxDays 
+        }),
+        staleTime:30*60*1000,
+        refetchOnMount:false
+    })
 
-    const getDifficultyBadge = (diff: string) => {
-        const map: Record<string, string> = {
-            Easy: "badge-success",
-            Moderate: "badge-warning",
-            Hard: "badge-danger",
-            Extreme: "badge-danger",
-        };
-        return map[diff] || "badge-neutral";
-    };
+    const handleEdit=(packageSlug?:string)=>{
+        router.push(`/dashboard/packages/edit/${packageSlug}`)
+    }
 
-    const getInitials = (name: string) => {
-        return name
-            .split(" ")
-            .map((word) => word[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
-    };
+    if(destinationLoading){
+        return <PageLoader/>
+    }
 
     return (
         <div className="w-full min-h-screen flex flex-col gap-6">
@@ -142,121 +76,11 @@ export default function PackagesPage() {
                 </button>
             </div>
 
-            {/* Filter Bar */}
-            <div className="card p-4 flex flex-col gap-4">
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
-                    {/* Search */}
-                    <div className="relative flex-1 min-w-0">
-                        <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
-                        <input
-                            type="text"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            placeholder="Search by title or destination..."
-                            className="input pl-10 w-full"
-                        />
-                    </div>
-
-                    {/* Destination */}
-                    <div className="relative">
-                        <select
-                            value={destination}
-                            onChange={(e) => setDestination(e.target.value)}
-                            className="input pr-9 appearance-none cursor-pointer min-w-[160px]"
-                        >
-                            {DESTINATIONS.map((d) => (
-                                <option key={d} value={d}>{d}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                    </div>
-
-                    {/* Difficulty */}
-                    <div className="relative">
-                        <select
-                            value={difficulty}
-                            onChange={(e) => setDifficulty(e.target.value)}
-                            className="input pr-9 appearance-none cursor-pointer min-w-[150px]"
-                        >
-                            {DIFFICULTIES.map((d) => (
-                                <option key={d} value={d}>{d}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                    </div>
-
-                    {/* Featured */}
-                    <div className="relative">
-                        <select
-                            value={featured}
-                            onChange={(e) => setFeatured(e.target.value)}
-                            className="input pr-9 appearance-none cursor-pointer min-w-[140px]"
-                        >
-                            {FEATURED_OPTIONS.map((f) => (
-                                <option key={f} value={f}>{f}</option>
-                            ))}
-                        </select>
-                        <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
-                    </div>
-
-                    {/* Advanced toggle */}
-                    <button
-                        type="button"
-                        onClick={() => setShowAdvanced((p) => !p)}
-                        className={`h-10 w-10 shrink-0 flex items-center justify-center rounded-xl border transition-colors cursor-pointer ${
-                            showAdvanced
-                                ? "border-primary-300 bg-primary-50 text-primary-700"
-                                : "border-neutral-200 bg-white text-neutral-500 hover:border-neutral-300"
-                        }`}
-                        title="Advanced filters"
-                    >
-                        <SlidersHorizontal size={16} />
-                    </button>
-                </div>
-
-                {/* Advanced Filters */}
-                {showAdvanced && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-3 border-t border-neutral-100">
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-neutral-500 tracking-wide">Min Price (USD)</label>
-                            <input type="number" placeholder="0" className="input" />
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-neutral-500 tracking-wide">Max Price (USD)</label>
-                            <input type="number" placeholder="10000" className="input" />
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-neutral-500 tracking-wide">Min Days</label>
-                            <input type="number" placeholder="1" className="input" />
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold text-neutral-500 tracking-wide">Max Days</label>
-                            <input type="number" placeholder="30" className="input" />
-                        </div>
-                    </div>
-                )}
-
-                {/* Result count */}
-                <div className="flex items-center justify-between">
-                    <p className="text-xs font-bold text-neutral-400 uppercase tracking-wide">
-                        Showing {start + 1} - {Math.min(start + limit, filtered.length)} of {filtered.length} packages
-                    </p>
-                    {(search || destination !== "All Regions" || difficulty !== "All Levels" || featured !== "All Status") && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setSearch("");
-                                setDestination("All Regions");
-                                setDifficulty("All Levels");
-                                setFeatured("All Status");
-                            }}
-                            className="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors cursor-pointer"
-                        >
-                            Clear filters
-                        </button>
-                    )}
-                </div>
-            </div>
+            <PackagesFilter
+                destinations={destinations?.data || []}
+                onChange={(f)=>{setFilters(f); setPage(1);}}
+                totalResults={data?.pagination?.total}
+            />
 
             {/* Table */}
             <div className="card overflow-hidden">
@@ -284,7 +108,7 @@ export default function PackagesPage() {
                             </tr>
                         )}
 
-                        {!isLoading && paginatedData.length === 0 && (
+                        {!isLoading && data?.data.length === 0 && (
                             <tr>
                                 <td colSpan={7} className="py-12 text-center text-neutral-500">
                                     <div className="flex flex-col items-center gap-2">
@@ -297,7 +121,7 @@ export default function PackagesPage() {
                         )}
 
                         {!isLoading &&
-                            paginatedData.map((pkg) => (
+                            data?.data.map((pkg) => (
                                 <tr key={pkg._id} className="hover:bg-neutral-50/50 transition-colors group">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-3">
@@ -306,7 +130,7 @@ export default function PackagesPage() {
                                                     <Image src={pkg.thumbnail} alt={pkg.title} width={40} height={40} className="rounded-lg object-cover" />
                                                 ) : (
                                                     <span className="text-neutral-400 font-bold text-xs">
-                                                        {getInitials(pkg.title)}
+                                                        {pkg.title}
                                                     </span>
                                                 )}
                                             </div>
@@ -318,7 +142,7 @@ export default function PackagesPage() {
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="py-4 px-6 text-neutral-600 font-medium">{pkg.destination}</td>
+                                    <td className="py-4 px-6 text-neutral-600 font-medium">{pkg.destination ? pkg.destination.name : "Not assigned"}</td>
                                     <td className="py-4 px-6">
                                         <div>
                                             <p className="font-bold text-neutral-900">${pkg.price.toLocaleString()}</p>
@@ -344,6 +168,7 @@ export default function PackagesPage() {
                                     <td className="py-4 px-6">
                                         <div className="flex items-center justify-center gap-1">
                                             <button
+                                            onClick={()=>handleEdit(pkg?._id)}
                                                 className="p-2 rounded-lg hover:bg-neutral-100 transition-colors text-neutral-400 hover:text-blue-600"
                                                 title="Edit package"
                                             >
@@ -364,27 +189,11 @@ export default function PackagesPage() {
                         <tr>
                             <td colSpan={7} className="px-6 py-4">
                                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 w-full">
-                                    <p className="text-sm font-medium text-neutral-600">
-                                        Showing{" "}
-                                        <span className="font-semibold text-neutral-900">
-                                            {filtered.length > 0 ? start + 1 : 0}
-                                        </span>{" "}
-                                        to{" "}
-                                        <span className="font-semibold text-neutral-900">
-                                            {Math.min(start + limit, filtered.length)}
-                                        </span>{" "}
-                                        of{" "}
-                                        <span className="font-semibold text-neutral-900">
-                                            {filtered.length}
-                                        </span>{" "}
-                                        packages
-                                    </p>
-
-                                    {totalPages > 1 && (
+                                    {data?.pagination?.page && data?.pagination?.page > 1 && (
                                         <Pagination
-                                            currentPage={currentPage}
-                                            totalPages={totalPages}
-                                            onPageChange={setCurrentPage}
+                                            currentPage={page}
+                                            totalPages={data?.pagination?.totalPages ?? 1}
+                                            onPageChange={setPage}
                                         />
                                     )}
                                 </div>
