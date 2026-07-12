@@ -17,6 +17,7 @@ const menuItems = [
   { name: 'Packages', href: '/dashboard/packages', icon: Mountain },
   { name: 'Categories & Destinations', href: '/dashboard/categories&destinations', icon: Map },
   { name: 'Inquiries', href: '/dashboard/inquiries', icon: MessageSquare },
+  { name: 'Campaigns', href: '/dashboard/campaigns', icon: MessageSquare },
   { name: 'Gallery', href: '/dashboard/gallery', icon: ImageIcon },
   { name: 'Company Info', href: '/dashboard/companyinfo', icon: Building2 },
   { name: "Content Management", href:"/dashboard/contentManagement",icon:FileText},

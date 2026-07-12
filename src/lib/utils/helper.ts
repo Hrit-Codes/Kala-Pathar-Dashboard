@@ -35,3 +35,33 @@ export async function fetchOrNull<T>(fn: () => Promise<T>): Promise<T | null> {
     throw error;
   }
 }
+
+export const getCampaignStatusLabel = (status: string) => {
+        switch (status) {
+            case "completed":
+                return "COMPLETED";
+            case "processing":
+                return "PROCESSING";
+            case "pending":
+                return "PENDING";
+            case "failed":
+                return "FAILED";
+            default:
+                return status.toUpperCase();
+        }
+    };
+
+export const getCampaignStatusBadge = (status: string) => {
+        switch (status) {
+            case "completed":
+                return "badge-success";
+            case "processing":
+                return "badge-warning";
+            case "pending":
+                return "badge-pending";
+            case "failed":
+                return "badge-error";
+            default:
+                return "badge";
+        }
+    };

@@ -57,7 +57,7 @@ export default function InquiryPage() {
     }
   }, [activeTab]);
 
-  const totalPages = inquiryData?.pagination?.totalPage || 1;
+  const totalPages = inquiryData?.pagination?.totalPages || 1;
 
   const handleTabChange = (tabValue: string) => {
     setActiveTab(tabValue);
