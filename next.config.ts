@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
     images: {
@@ -13,6 +14,10 @@ const nextConfig: NextConfig = {
                 port: "5000",
             },
         ],
+    },
+    turbopack: {
+        // Use absolute path explicitly
+        root: "C:\\Users\\amaty\\Documents\\MERN\\Kala-Pathar-Dashboard",
     },
 };
 

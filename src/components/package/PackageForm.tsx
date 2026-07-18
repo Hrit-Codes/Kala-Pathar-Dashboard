@@ -132,12 +132,9 @@ export default function PackageForm({ mode, initialData, packageId, onSuccess }:
         ]
     );
 
-    // Itinerary
+    // Itinerary (optional — starts empty, user opts in via "Add Day")
     const [itinerary, setItinerary] = useState<ItineraryDay[]>(
-        initialData?.itinerary?.map((c: any) => ({ ...c, id: genId() })) ??
-        [
-            { id: genId(), day: 1, title: "", description: "" },
-        ]
+        initialData?.itinerary?.map((c: any) => ({ ...c, id: genId() })) ?? []
     );
 
     // Terms & Conditions
@@ -933,15 +930,13 @@ export default function PackageForm({ mode, initialData, packageId, onSuccess }:
                                             <span className="text-xs font-bold text-primary-700 uppercase tracking-wide">
                                                 Day {day.day}
                                             </span>
-                                            {itinerary.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeItineraryDay(day.id)}
-                                                    className="text-neutral-400 hover:text-red-500 transition-colors"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => removeItineraryDay(day.id)}
+                                                className="text-neutral-400 hover:text-red-500 transition-colors"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
                                         </div>
                                         <input
                                             type="text"

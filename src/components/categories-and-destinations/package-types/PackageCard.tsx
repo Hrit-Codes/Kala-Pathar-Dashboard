@@ -1,14 +1,15 @@
 "use client";
 
-import { Camera, Coffee, Compass, Globe, GripVertical, Heart, Map, Mountain, Pencil, Sparkles, Star, Check, X, Trash2 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Check, X, GripVertical, Pencil, Trash2 } from "lucide-react";
 import IconPicker from "../../ui/IconPicker";
 import ColorPicker from "../../ui/ColorPicker";
 import ConfirmDeleteModal from "../../ui/ConfirmDeletePopup";
 import { updatePackageType, type IPackageType } from "@/src/lib/api/package-types";
 import type { PackageTypeFormValues } from "@/src/lib/vallidators/package-type.validate";
+import { iconMap } from "@/src/lib/utils/helper";
 
 interface PackageCardProps {
     type: IPackageType;
@@ -46,23 +47,16 @@ export default function PackageCard({
         isActive: type.isActive,
     });
 
-    const iconMap: Record<string, React.ReactNode> = {
-        mountain: <Mountain size={22} />,
-        compass: <Compass size={22} />,
-        map: <Map size={22} />,
-        camera: <Camera size={22} />,
-        coffee: <Coffee size={22} />,
-        heart: <Heart size={22} />,
-        star: <Star size={22} />,
-        globe: <Globe size={22} />,
-        sparkles: <Sparkles size={22} />,
-    };
-
+    // ✅ Get icon from the centralized iconMap
     const getIcon = (iconName: string, color?: string) => {
         const IconComponent = iconMap[iconName];
         if (IconComponent) {
-            return <span style={{ color: color || "#10B981" }}>{IconComponent}</span>;
+            // Clone the icon with the color
+            return React.cloneElement(IconComponent as React.ReactElement, {
+                style: { color: color || "#10B981" },
+            } as React.Attributes);
         }
+        // Fallback for missing icons
         return (
             <span
                 className="text-lg font-bold uppercase"
@@ -73,7 +67,7 @@ export default function PackageCard({
         );
     };
 
-    const bgColor = `#${type.themeColor?.replace("#", "")}18`;
+    const bgColor = type.themeColor ? `#${type.themeColor.replace("#", "")}18` : "transparent";
     const iconColor = type.themeColor;
 
     const updateMutation = useMutation({
@@ -157,7 +151,7 @@ export default function PackageCard({
 
     const handleConfirmDelete = () => {
         onDelete(type._id);
-        console.log("Id:",type._id);
+        console.log("Id:", type._id);
         setShowDeleteConfirm(false);
     };
 
@@ -348,6 +342,11 @@ export default function PackageCard({
                         {!type.isActive && (
                             <span className="badge bg-neutral-100 text-neutral-400 text-[10px] normal-case">
                                 Inactive
+                            </span>
+                        )}
+                        {type.hasDifficultyLevels && (
+                            <span className="badge bg-primary-50 text-primary-600 text-[10px] normal-case">
+                                ⚡ Difficulty
                             </span>
                         )}
                     </div>

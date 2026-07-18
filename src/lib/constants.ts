@@ -115,13 +115,67 @@ export const ALL_ICONS = [
     { label: "Heart", value: "heart", component: "Heart" },
     { label: "Compass", value: "compass", component: "Compass" },
     { label: "Map", value: "map", component: "Map" },
-    // From PACKAGE_TYPES_ICONS (unique ones)
+    
+    // From PACKAGE_TYPES_ICONS
     { label: "Camera", value: "camera", component: "Camera" },
     { label: "Coffee", value: "coffee", component: "Coffee" },
     { label: "Sparkles", value: "sparkles", component: "Sparkles" },
     { label: "Tent", value: "tent", component: "Tent" },
-    { label: "Tree", value: "tree", component: "Tree" },
     { label: "Cloud", value: "cloud", component: "Cloud" },
+    
+    // NEW ICONS FOR TRAVEL & ADVENTURE
+    { label: "Binoculars", value: "binoculars", component: "Binoculars" },
+    { label: "Zap", value: "zap", component: "Zap" },
+    { label: "Hotel", value: "hotel", component: "Hotel" },
+    { label: "Sun", value: "sun", component: "Sun" },
+    { label: "Moon", value: "moon", component: "Moon" },
+    { label: "Umbrella", value: "umbrella", component: "Umbrella" },
+    { label: "Wind", value: "wind", component: "Wind" },
+    { label: "Snowflake", value: "snowflake", component: "Snowflake" },
+    { label: "Flame", value: "flame", component: "Flame" },
+    { label: "Droplets", value: "droplets", component: "Droplets" },
+    { label: "Leaf", value: "leaf", component: "Leaf" },
+    { label: "Flower", value: "flower", component: "Flower" },
+    { label: "Feather", value: "feather", component: "Feather" },
+    { label: "Crown", value: "crown", component: "Crown" },
+    { label: "Gem", value: "gem", component: "Gem" },
+    { label: "Diamond", value: "diamond", component: "Diamond" },
+    { label: "Medal", value: "medal", component: "Medal" },
+    { label: "Trophy", value: "trophy", component: "Trophy" },
+    
+    // TRAVEL & TRANSPORTATION
+    { label: "Plane", value: "plane", component: "Plane" },
+    { label: "Car", value: "car", component: "Car" },
+    { label: "Bus", value: "bus", component: "Bus" },
+    { label: "Bike", value: "bike", component: "Bike" },
+    { label: "Ship", value: "ship", component: "Ship" },
+    { label: "Train", value: "train", component: "Train" },
+    { label: "Rocket", value: "rocket", component: "Rocket" },
+    
+    // NATURE & LANDSCAPE
+    { label: "MountainSnow", value: "mountainSnow", component: "MountainSnow" },
+    
+    // FOOD & DINING
+    { label: "Wine", value: "wine", component: "Wine" },
+    { label: "Beer", value: "beer", component: "Beer" },
+    { label: "Cake", value: "cake", component: "Cake" },
+    { label: "Pizza", value: "pizza", component: "Pizza" },
+    { label: "Utensils", value: "utensils", component: "Utensils" },
+    
+    // CULTURE & RELIGION
+    { label: "Church", value: "church", component: "Church" },
+    
+    // MISC
+    { label: "Gift", value: "gift", component: "Gift" },
+    { label: "Music", value: "music", component: "Music" },
+    { label: "Book", value: "book", component: "Book" },
+    { label: "Video", value: "video", component: "Video" },
+    { label: "Image", value: "image", component: "Image" },
+    { label: "Phone", value: "phone", component: "Phone" },
+    { label: "Mail", value: "mail", component: "Mail" },
+    { label: "Share", value: "share", component: "Share" },
+    { label: "HeartHandshake", value: "heartHandshake", component: "HeartHandshake" },
+    { label: "Handshake", value: "handshake", component: "Handshake" },
 ] as const;
 
 
