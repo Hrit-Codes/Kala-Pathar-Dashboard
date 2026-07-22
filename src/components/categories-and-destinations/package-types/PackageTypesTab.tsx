@@ -68,10 +68,10 @@ export default function PackageTypesTab({ initialData }: IPackageTypesProps) {
 
     return (
         <div className="w-full flex flex-col gap-6">
-            <div className="grid grid-cols-1 xl:grid-cols-14 gap-6 items-start p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-14 gap-6 items-start p-6">
 
                 {/* ── Left: List ──────────────────────────────────────────── */}
-                <div className="xl:col-span-8 flex flex-col gap-4">
+                <div className="lg:col-span-8 flex flex-col gap-4">
 
                     {/* Header */}
                     <div className="flex items-center justify-between ">
@@ -117,7 +117,7 @@ export default function PackageTypesTab({ initialData }: IPackageTypesProps) {
                 </div>
 
                 {/* ── Right: Quick Add Form ───────────────────────────────── */}
-                <div className="xl:col-span-6">
+                <div className="lg:col-span-6">
                     <PackageTypeForm handleUpdate={handleUpdate}/>
                 </div>
             </div>
