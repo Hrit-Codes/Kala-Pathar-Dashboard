@@ -1,28 +1,40 @@
 "use client";
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Mountain, 
-  Map, 
-  MessageSquare, 
-  Image as ImageIcon,  
-  Settings, 
-  Building2,
-  FileText,
+import { usePathname, useRouter } from 'next/navigation';
+import {
+  Mountain,
+  Image as ImageIcon,
   X,
   Menu
 } from 'lucide-react';
 import { menuItems } from '@/src/lib/constants';
 import { useEffect, useState } from 'react';
+import { logout } from '@/src/lib/api/auth';
+import { toast } from 'sonner';
 
 export default function Sidebar() {
   const [sidebarOpen, setSidebarOpen]=useState(false);
+  const [isLoggingOut, setIsLoggingOut]=useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(()=>{
     setSidebarOpen(false)
   },[pathname]);
+
+  const handleLogout=async()=>{
+    setIsLoggingOut(true);
+    try{
+      await logout();
+      localStorage.removeItem("access_token");
+      router.push("/login");
+    }catch(error:any){
+      const message= error.response?.data?.message || "Failed to logout. Please try again.";
+      toast.error(message);
+    }finally{
+      setIsLoggingOut(false);
+    }
+  }
 
   return (
     <div className='w-screen h-full'>
@@ -98,22 +110,13 @@ export default function Sidebar() {
 
         {/* Footer / Settings Section */}
         <div className="p-4 border-t border-white/5">
-          <Link
-            href="/dashboard/settings"
-            className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all group duration-300 ${
-              pathname === '/dashboard/settings' 
-                ? "text-white bg-white/5 font-bold" 
-                : "hover:text-white hover:bg-white/[0.02]"
-            }`}
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all group duration-300 w-full hover:text-white hover:bg-white/[0.02] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <Settings 
-              size={20} 
-              className={`transition-colors duration-300 ${
-                pathname === '/dashboard/settings' ? "text-[#10B981]" : "text-neutral-500 group-hover:text-neutral-300"
-              }`} 
-            />
-            <span>Settings</span>
-          </Link>
+            {isLoggingOut ? "Logging out..." : "Logout"}
+          </button>
         </div>
       </aside>
     </div>
