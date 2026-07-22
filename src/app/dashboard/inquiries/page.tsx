@@ -21,7 +21,7 @@ export default function InquiryPage() {
   const [currentPage, setCurrentPage] = useState(initialPage);
   const limit = 10;
 
-  const [sliderStyle, setSliderStyle] = useState({ left: 0, width: 0 });
+  const [sliderStyle, setSliderStyle] = useState({ left: 0, top:0, width: 0, height:0 });
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const { data: inquiryData, isLoading, isError } = useQuery({
@@ -46,15 +46,23 @@ export default function InquiryPage() {
   }, [currentPage, activeTab, router]);
 
   useEffect(() => {
-    const activeIndex = INQUIRY_FILTER_TABS.findIndex((tab) => tab.value === activeTab);
-    const element = tabRefs.current[activeIndex];
+    const updateSlider=()=>{
+      const activeIndex = INQUIRY_FILTER_TABS.findIndex((tab) => tab.value === activeTab);
+      const element = tabRefs.current[activeIndex];
 
-    if (element) {
-      setSliderStyle({
-        left: element.offsetLeft,
-        width: element.offsetWidth,
-      });
+      if (element) {
+        setSliderStyle({
+          left: element.offsetLeft,
+          top: element.offsetTop,
+          width: element.offsetWidth,
+          height:element.offsetHeight,
+        });
+      }
     }
+
+    updateSlider();
+    window.addEventListener("resize",updateSlider);
+    return(()=>window.removeEventListener("resize",updateSlider))
   }, [activeTab]);
 
   const totalPages = inquiryData?.pagination?.totalPages || 1;
@@ -87,13 +95,15 @@ export default function InquiryPage() {
         subheading="Review and respond to expedition inquiries and client requests"
       />
 
-      <div className="card flex items-center justify-between p-2 w-fit">
-        <div className="flex items-center relative gap-1">
+      <div className="card flex items-center justify-between p-2 w-fit mx-auto md:mx-0">
+        <div className="flex flex-col md:flex-row items-center relative gap-1 mx-auto">
           <div
             className="absolute h-[calc(100%-4px)] top-0.5 rounded-xl bg-primary-600 transition-all duration-300 ease-out pointer-events-none"
             style={{
               left: sliderStyle.left,
+              top:sliderStyle.top,
               width: sliderStyle.width,
+              height: sliderStyle.height
             }}
           />
 

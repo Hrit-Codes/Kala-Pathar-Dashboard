@@ -1,31 +1,14 @@
-import { Mountain, MessageSquare, Map, Star } from "lucide-react";
-import type { IPackageType } from "./api/package-types";
+import { Mountain, MessageSquare, Map, Star, LayoutDashboard, ImageIcon, Building2, FileText } from "lucide-react";
 
-export const DASHBOARD_STATS = [
-  {
-    title: "TOTAL EXPEDITIONS",
-    value: 24,
-    icon: Mountain,
-    iconBg: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400",
-  },
-  {
-    title: "ACTIVE INQUIRIES",
-    value: 156,
-    icon: MessageSquare,
-    iconBg: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400",
-  },
-  {
-    title: "DESTINATIONS COVERED",
-    value: 12,
-    icon: Map,
-    iconBg: "bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400",
-  },
-  {
-    title: "FEATURED PACKAGES",
-    value: 5,
-    icon: Star,
-    iconBg: "bg-teal-50 text-teal-600 dark:bg-teal-950/30 dark:text-teal-400",
-  }
+export const menuItems = [
+  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Packages', href: '/dashboard/packages', icon: Mountain },
+  { name: 'Categories & Destinations', href: '/dashboard/categories&destinations', icon: Map },
+  { name: 'Inquiries', href: '/dashboard/inquiries', icon: MessageSquare },
+  { name: 'Campaigns', href: '/dashboard/campaigns', icon: MessageSquare },
+  { name: 'Gallery', href: '/dashboard/gallery', icon: ImageIcon },
+  { name: 'Company Info', href: '/dashboard/companyinfo', icon: Building2 },
+  { name: "Content Management", href:"/dashboard/contentManagement",icon:FileText },
 ];
 
 export const RECENT_INQUIRIES = [

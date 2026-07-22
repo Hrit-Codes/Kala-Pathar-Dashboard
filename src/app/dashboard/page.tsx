@@ -1,7 +1,6 @@
-// src/app/dashboard/page.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { Edit, Trash2, PlusCircle, ImageIcon, Users, Zap, Search, Eye, Mail, PackageIcon } from "lucide-react";
+import { Edit, PlusCircle, ImageIcon, Users, Zap, Search, Eye, Mail, PackageIcon } from "lucide-react";
 import PageHeader from "@/src/components/layout/PageHeader";
 import { DashboardAnalyticsData, getAnalytics, getTopPackages, TopPackage } from "@/src/lib/api/analytics";
 
