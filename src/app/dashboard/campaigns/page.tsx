@@ -42,7 +42,7 @@ export default  function CampaignPage() {
                 </a>
             </div>
 
-            <div className="card overflow-hidden">
+            <div className="card overflow-x-auto">
                 <table className="w-full border-collapse text-left">
                     <thead>
                         <tr className="bg-neutral-50 border-b border-neutral-100 text-xs font-bold tracking-wider text-neutral-500 uppercase">

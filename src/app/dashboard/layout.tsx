@@ -19,7 +19,7 @@ export default async function DashboardLayout({
         <div className="min-h-screen bg-section">
             <Sidebar/>
 
-            <div className="pl-[280px] min-h-screen flex flex-col">
+            <div className="lg:pl-[280px] min-h-screen flex flex-col">
                 <main className="flex-1 p-8 ">
                     <AuthSync token={token}/>
                     {children}
