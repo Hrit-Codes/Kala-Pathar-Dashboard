@@ -19,6 +19,8 @@ yarn-error.log*
 # Local Environment Variables (CRITICAL for security)
 .env
 .env.local
+.env.development
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local

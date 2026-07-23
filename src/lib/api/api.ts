@@ -1,8 +1,10 @@
 import axios from "axios";
 import { refreshAccessToken } from "./auth";
+import config from "@/src/config";
 
 export const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: config.apiUrl,
+    timeout:10000,
     withCredentials: true,
 });
 
