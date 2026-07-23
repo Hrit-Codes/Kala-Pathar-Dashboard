@@ -5,14 +5,9 @@ import PageHeader from "@/src/components/layout/PageHeader";
 import { DashboardAnalyticsData, getAnalytics, getTopPackages, TopPackage } from "@/src/lib/api/analytics";
 
 export default async function DashboardPage() {
-  console.log("🔍 Fetching dashboard data...");
   const packagesResponse = await getTopPackages();
-  console.log("📦 Packages Response:", JSON.stringify(packagesResponse, null, 2));
-  console.log("packages data::",packagesResponse);
   const topPackages: TopPackage[] = packagesResponse?.data || [];
-  console.log("📦 Top Packages:", topPackages.length);
   const analyticsResponse=await getAnalytics();
-  console.log("📊 Analytics Response:", JSON.stringify(analyticsResponse, null, 2));
   const defaultStats: DashboardAnalyticsData = {
     inquiries: {
       thisMonth: 0,
